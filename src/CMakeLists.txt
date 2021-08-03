@@ -5,4 +5,18 @@ target_sources(bammi
 		Engine.h
 		Game.cpp
 		Game.h
+		Grid.cpp
+		Grid.h
+		Vector2.h
+		Sprite.cpp
+		Sprite.h
+		ErrorHandler.h
+		RectangleDraw.h
+		BammiBoard.cpp
+		BammiBoard.h
+		robin_hood.h
+		Text.cpp
+		Text.h
+		WindowHandler.cpp
+		WindowHandler.h
 )

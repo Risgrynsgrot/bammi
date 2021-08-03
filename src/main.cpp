@@ -1,14 +1,9 @@
-#include <SDL.h>
-#include <SDL2/SDL_image.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <emscripten/websocket.h>
 #endif
-#include <stdlib.h>
-#include <string>
-#include <iostream>
-#include "Game.h"
 #include "Engine.h"
+#include <time.h>
 
 Engine engine;
 
@@ -69,7 +64,7 @@ int main(int argc, char *argv[])
     //emscripten_websocket_close()
     //emscripten_websocket_set_onmessage_callback()
 
-
+    srand(time(NULL));
     engine.Init();
     return 0;
 }

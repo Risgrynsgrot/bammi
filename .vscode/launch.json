@@ -10,7 +10,7 @@
 			"name": "Debug",
 			"program": "${workspaceFolder}/bin/bammi.exe",
 			"args": [],
-			"cwd": "${workspaceFolder}"
+			"cwd": "${workspaceFolder}/bin/"
 		}
 	]
 }
