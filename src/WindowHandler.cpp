@@ -1,6 +1,6 @@
 #include "WindowHandler.h"
 
-WindowHandler* WindowHandler::myInstance;
+WindowHandler* WindowHandler::myInstance = nullptr;
 
 void WindowHandler::SetWindow(SDL_Window* aWindow)
 {

@@ -12,7 +12,7 @@ void Game::Start()
 	mySprite.Init("assets/test.png", myRenderer);
 	mySprite.SetPosition({64.f, 64.f});
 
-	myBoard.Init({8, 8}, myRenderer);
+	myBoard.Init({5, 5}, myRenderer);
 
 	myText.Init("assets/OptimusPrinceps.ttf", 48, myRenderer);
 	myText.SetText("Nice");
@@ -29,7 +29,7 @@ void Game::Render()
 	mySprite.Render();
 	myBoard.Render();
 	myText.Render();
-	myBoard.RenderDebug();
+	//myBoard.RenderDebug();
 }
 
 void Game::Quit()

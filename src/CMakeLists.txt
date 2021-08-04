@@ -11,7 +11,6 @@ target_sources(bammi
 		Sprite.cpp
 		Sprite.h
 		ErrorHandler.h
-		RectangleDraw.h
 		BammiBoard.cpp
 		BammiBoard.h
 		robin_hood.h
@@ -19,4 +18,6 @@ target_sources(bammi
 		Text.h
 		WindowHandler.cpp
 		WindowHandler.h
+		Primitives.cpp
+		Primitives.h
 )

@@ -1,13 +1,14 @@
 #include "BammiBoard.h"
 #include "WindowHandler.h"
 #include <stack>
+#include "Primitives.h"
 
 void Bammi::Board::Init(Vector2i aBoardSize, SDL_Renderer* aRenderer)
 {
 	const int cellSize = 64;
 	myGrid.Init(aBoardSize, cellSize, {128.f, 128.f});
-	myRectangle.Init("assets/whitePixel.bmp", aRenderer);
-	myRectangle.SetSize({cellSize, cellSize});
+	//myRectangle.Init("assets/whitePixel.bmp", aRenderer);
+	//myRectangle.SetSize({cellSize, cellSize});
 	myTileIdText.Init("assets/hack.ttf", 14, aRenderer);
 	SetupTiles();
 }
@@ -20,17 +21,54 @@ void Bammi::Board::Render()
 		for (int x = 0; x < gridSize.x; x++)
 		{
 			Cell* cell = myGrid.GetCellAtGridPos(x, y);
+			Color color;
 			if(cell->hovered)
 			{
-				myRectangle.SetColorRGB(0.7f, 0.7f, 0.7f);
+				color = {0.7f, 0.7f, 0.7f, 1.f};
 			}
-			Vector2f cellPos(x * myGrid.GetCellSize(), y * myGrid.GetCellSize());
+			auto cellSize = myGrid.GetCellSize();
+			Vector2f cellPos(x * cellSize, y * cellSize);
 			cellPos += myGrid.GetPosition();
-			myRectangle.SetPosition(cellPos);
-			myRectangle.Render();
-			myRectangle.SetColorRGB(1.f, 1.f, 1.f);
+			auto& primDraw = PrimitiveDrawer::GetInstance();
+			primDraw.DrawRectangle(cellPos, {cellSize, cellSize}, color);
+			//myRectangle.SetPosition(cellPos);
+			//myRectangle.Render();
+			//myRectangle.SetColorRGB(1.f, 1.f, 1.f);
+
+			if((cell->myBorder & (int)Border::right))
+			{
+				primDraw.DrawLine({cellPos.x + cellSize, cellPos.y}, {cellPos.x + cellSize, cellPos.y + cellSize}, 2.f, {1,0,1,1});
+			}
+			if((cell->myBorder & (int)Border::left))
+			{
+				primDraw.DrawLine({cellPos.x, cellPos.y}, {cellPos.x, cellPos.y + cellSize}, 2.f, {1,0,1,1});
+			}
+			if((cell->myBorder & (int)Border::up))
+			{
+				primDraw.DrawLine({cellPos.x, cellPos.y}, {cellPos.x + cellSize, cellPos.y}, 2.f, {1,0,1,1});
+			}
+			if((cell->myBorder & (int)Border::down))
+			{
+				primDraw.DrawLine({cellPos.x, cellPos.y + cellSize}, {cellPos.x + cellSize, cellPos.y + cellSize}, 2.f, {1,0,1,1});
+			}
+
+
 		}
 	}
+	for (auto& pair : myTiles)
+	{
+		auto& tile = pair.second;
+
+		Cell* tileCell = myGrid.GetCellAtIndex(tile.cells[0]);
+
+		myTileIdText.SetPosition(myGrid.GetCellPosition(tile.cells[0]));
+		char buffer[64];
+		sprintf(buffer, "%d / %d", tile.fillRate, (int)tile.neighbors.size());
+		myTileIdText.SetText(buffer);
+		myTileIdText.SetColor(0,0,0);
+		myTileIdText.Render();
+	}
+	
 }
 
 void Bammi::Board::RenderDebug()
@@ -51,6 +89,12 @@ void Bammi::Board::RenderDebug()
 			myTileIdText.Render();
 		}
 	}
+
+
+	Vector2i mousePos;
+	SDL_GetMouseState(&mousePos.x, &mousePos.y);
+	Vector2i windowCenter = WindowHandler::GetInstance()->GetWindowSize() / 2;
+	PrimitiveDrawer::GetInstance().DrawLine({mousePos.x, mousePos.y}, {windowCenter.x, windowCenter.y},  8, {1,0,1,1});
 }
 
 void Bammi::Board::Update(float aDeltaTime)
@@ -97,6 +141,7 @@ void Bammi::Board::SetupTiles()
 	int cellCount = myGrid.GetSize().x * myGrid.GetSize().y;
 	bool placedTile = false;
 
+	//Create Tiles
 	for (size_t i = 0; i < cellCount; i++)
 	{
 		myCellsToAssign.push(i);
@@ -160,6 +205,41 @@ void Bammi::Board::SetupTiles()
 		{
 			currentTileId++;
 			placedTile = false;
+		}
+	}
+
+	//Create Borders
+	for (int y = 0; y < myGrid.GetSize().y; y++)
+	{
+		for(int x = 0; x < myGrid.GetSize().x; x++)
+		{
+			Cell *cell = myGrid.GetCellAtGridPos(x, y);
+
+			Cell *cellRight = myGrid.GetCellAtGridPos(x + 1, y);
+			Cell *cellLeft = myGrid.GetCellAtGridPos(x - 1, y);
+			Cell *cellUp = myGrid.GetCellAtGridPos(x, y - 1);
+			Cell *cellDown = myGrid.GetCellAtGridPos(x, y + 1);
+
+			if (cellRight != nullptr && cellRight->tileId != cell->tileId)
+			{
+				cell->myBorder += (int)Border::right;
+				myTiles[cell->tileId].neighbors.insert(cellRight->tileId);
+			}
+			if (cellLeft != nullptr && cellLeft->tileId != cell->tileId)
+			{
+				cell->myBorder += (int)Border::left;
+				myTiles[cell->tileId].neighbors.insert(cellLeft->tileId);
+			}
+			if (cellUp != nullptr && cellUp->tileId != cell->tileId)
+			{
+				cell->myBorder += (int)Border::up;
+				myTiles[cell->tileId].neighbors.insert(cellUp->tileId);
+			}
+			if (cellDown != nullptr && cellDown->tileId != cell->tileId)
+			{
+				cell->myBorder += (int)Border::down;
+				myTiles[cell->tileId].neighbors.insert(cellDown->tileId);
+			}
 		}
 	}
 }

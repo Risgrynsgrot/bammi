@@ -17,6 +17,19 @@ public:
 	inline Vector2f GetPosition() const {return myPosition;};
 	inline void SetPosition(const Vector2f aPosition){myPosition = aPosition;};
 	inline Vector2i GetSize() const {return mySize;};
+	inline Vector2i IndexToGridPos(int aIndex)
+	{
+		int x = aIndex % mySize.x;
+		int y = aIndex / mySize.x;
+		return {x, y};
+	};
+	inline Vector2f GetCellPosition(int aCellIndex)
+	{
+		Vector2i gridPos = IndexToGridPos(aCellIndex);
+		Vector2f result = {gridPos.x * myCellSize, gridPos.y * myCellSize};
+		result += myPosition;
+		return result;
+	}
 private:
 	T* myData = nullptr;
 	Vector2i mySize;

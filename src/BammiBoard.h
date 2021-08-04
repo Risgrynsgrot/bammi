@@ -7,17 +7,26 @@
 
 namespace Bammi
 {
+	typedef int TileIndex;
+	typedef int CellIndex;
+	enum struct Border
+	{
+		right = 1 << 0,
+		up = 	1 << 1,
+		left = 	1 << 2,
+		down = 	1 << 3
+	};
 	struct Cell
 	{
-		int tileId = -1;
+		TileIndex tileId = -1;
 		bool hovered = false;
+		int myBorder = 0;
 	};
 
 	struct Tile
 	{
-		typedef int cellIndex;
-		std::vector<cellIndex> cells;
-		std::vector<Tile> neighbors;
+		std::vector<CellIndex> cells;
+		robin_hood::unordered_set<TileIndex> neighbors;
 		int fillRate = 0;
 	};
 
@@ -31,7 +40,7 @@ namespace Bammi
 	private:
 		void SetupTiles();
 		Grid<Cell> myGrid;
-		robin_hood::unordered_map<int, Tile> myTiles;
+		robin_hood::unordered_map<TileIndex, Tile> myTiles;
 		Sprite myRectangle;
 		Text myTileIdText;
 	};

@@ -45,7 +45,10 @@ void Sprite::SetSize(float aWidth, float aHeight)
 
 void Sprite::Render()
 {
-	SDL_RenderCopyF(myRenderer, myTexture, NULL, &myDestRect);
+	SDL_FPoint center;
+	center.x = myCenter.x;
+	center.y = myCenter.y;
+	SDL_RenderCopyExF(myRenderer, myTexture, NULL, &myDestRect, myRotation, &center, SDL_FLIP_NONE); //maybe add flip options if necessary
 }
 void Sprite::SetColorRGB(float r, float g, float b)
 {
@@ -53,6 +56,24 @@ void Sprite::SetColorRGB(float r, float g, float b)
 	int newG = (int)(g * 255.f);
 	int newB = (int)(b * 255.f);
 	SDL_SetTextureColorMod(myTexture, newR, newG, newB);
+}
+void Sprite::SetRotation(float aRotation)
+{
+	myRotation = aRotation;
+}
+float Sprite::GetRotation()
+{
+	return myRotation;
+}
+void Sprite::SetCenter(Vector2f aCenter)
+{
+	myCenter = aCenter;
+}
+void Sprite::Reset()
+{
+	myRotation = 0;
+	myCenter = {0,0};
+	myDestRect = {0,0,0,0};
 }
 Sprite::~Sprite()
 {

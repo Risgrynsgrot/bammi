@@ -9,6 +9,7 @@
 #include <emscripten/websocket.h>
 #endif
 #include "WindowHandler.h"
+#include "Primitives.h"
 
 bool Engine::Init()
 {
@@ -16,6 +17,8 @@ bool Engine::Init()
 	myGame.Init(myRenderer);
 
 	myMousePos.Init("assets/hack.ttf", 14, myRenderer);
+
+	PrimitiveDrawer::GetInstance().Init(myRenderer);
 
 	InitMainLoop();
 	Quit();
