@@ -33,7 +33,6 @@ public:
 private:
     void RenderPlayer(int aPlayerIndex, Vector2f aPosition);
     void RenderPlayerList();
-    void RenderTurn();
     int myTurn = 0;
     int myCurrentPlayer = 0;
     std::vector<Player> myPlayers;

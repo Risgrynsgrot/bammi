@@ -64,7 +64,7 @@ void Engine::InitRendering()
 	auto height = dm.h;
 	width /= 1.5f;
 	height /= 1.5f;
-	myWindow = SDL_CreateWindow("nice", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, ::SDL_WINDOW_RESIZABLE);
+	myWindow = SDL_CreateWindow("Bammi 2.0", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, ::SDL_WINDOW_RESIZABLE);
 	myRenderer = SDL_CreateRenderer(myWindow, -1, 0);
 	//myRenderTarget = SDL_CreateRGBSurface(0, 1920, 1080, 32, 0, 0, 0, 0);
 	WindowHandler::GetInstance()->SetWindow(myWindow);
@@ -101,7 +101,8 @@ void Engine::UpdateDebug()
 }
 
 void Engine::Render()
-{
+{        
+	SDL_SetRenderDrawColor(myRenderer, 41, 40, 40, 255);
 	SDL_RenderClear(myRenderer);
 	myGame.Render();
 }

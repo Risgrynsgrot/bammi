@@ -38,7 +38,6 @@ Player &PlayerManager::GetPlayer(int aIndex)
 void PlayerManager::Render()
 {
     RenderPlayerList();
-    RenderTurn();
 }
 void PlayerManager::RenderPlayerList()
 {
@@ -63,9 +62,6 @@ void PlayerManager::RenderPlayer(int aPlayerIndex, Vector2f aPosition)
     myText.SetText(buffer);
     myText.Render();
 }
-void PlayerManager::RenderTurn()
-{
-}
 void PlayerManager::Init(SDL_Renderer *aRenderer, Bammi::Board* aBoard)
 {
     myText.Init("assets/hack.ttf", 24, aRenderer);
@@ -79,7 +75,7 @@ void PlayerManager::Update()
 {
     auto windowSize = WindowHandler::GetInstance()->GetWindowSize();
     windowSize.y /= 2;
-    windowSize.x /= 4;
+    windowSize.x = 32;
     myPlayerListPosition = {windowSize.x, windowSize.y};
 }
 int PlayerManager::GetCurrentPlayerIndex()

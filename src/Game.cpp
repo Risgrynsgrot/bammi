@@ -11,14 +11,7 @@ void Game::Init(SDL_Renderer* aRenderer)
 
 void Game::Start()
 {
-	mySprite.Init("assets/test.png", myRenderer);
-	mySprite.SetPosition({64.f, 64.f});
-
 	myBoard.Init({5, 5}, myRenderer, &myPlayerManager);
-
-	myText.Init("assets/OptimusPrinceps.ttf", 48, myRenderer);
-	myText.SetText("Nice");
-	myText.SetPosition({512.f, 128.f});
 
 	myPlayerManager.Init(myRenderer, &myBoard);
 	myPlayerManager.AddPlayer({{1, 0, 1, 1}, "Benjamin"});
@@ -56,9 +49,7 @@ void Game::Update(float aDeltaTime)
 
 void Game::Render()
 {
-	mySprite.Render();
 	myBoard.Render();
-	myText.Render();
 	myPlayerManager.Render();
 	//myBoard.RenderDebug();
 }

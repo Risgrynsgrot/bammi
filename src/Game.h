@@ -17,9 +17,6 @@ public:
 private:
 	void FillTile(int aTileIndex, int aPlayerIndex);
 	PlayerManager myPlayerManager;
-	Sprite mySprite;
-	Sprite myRectangle;
 	SDL_Renderer* myRenderer;
 	Bammi::Board myBoard;
-	Text myText;
 };
