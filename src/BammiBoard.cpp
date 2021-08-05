@@ -2,9 +2,12 @@
 #include "WindowHandler.h"
 #include <stack>
 #include "Primitives.h"
+#include "InputHandler.h"
+#include "PlayerManager.h"
 
-void Bammi::Board::Init(Vector2i aBoardSize, SDL_Renderer* aRenderer)
+void Bammi::Board::Init(Vector2i aBoardSize, SDL_Renderer* aRenderer, PlayerManager* aPlayerManager)
 {
+	myPlayerManager = aPlayerManager;
 	const int cellSize = 64;
 	myGrid.Init(aBoardSize, cellSize, {128.f, 128.f});
 	//myRectangle.Init("assets/whitePixel.bmp", aRenderer);
@@ -21,10 +24,13 @@ void Bammi::Board::Render()
 		for (int x = 0; x < gridSize.x; x++)
 		{
 			Cell* cell = myGrid.GetCellAtGridPos(x, y);
-			Color color;
+			auto playerOwned = myTiles[cell->tileId].playerIndex;
+			Color color = playerOwned != -1 ? myPlayerManager->GetPlayer(playerOwned).myColor : Color();
 			if(cell->hovered)
 			{
-				color = {0.7f, 0.7f, 0.7f, 1.f};
+				color.r *= 0.7f;
+				color.g *= 0.7f;
+				color.b *= 0.7f;
 			}
 			auto cellSize = myGrid.GetCellSize();
 			Vector2f cellPos(x * cellSize, y * cellSize);
@@ -118,8 +124,7 @@ void Bammi::Board::Update(float aDeltaTime)
 	}
 
 	//Set hovered
-	Vector2i mousePos;
-	SDL_GetMouseState(&mousePos.x, &mousePos.y);
+	Vector2i mousePos = InputHandler::GetInstance().GetMousePosition();
 	Cell *cell = myGrid.GetCellAtPosition(mousePos.x, mousePos.y);
 	if (cell != nullptr)
 	{
@@ -240,6 +245,48 @@ void Bammi::Board::SetupTiles()
 				cell->myBorder += (int)Border::down;
 				myTiles[cell->tileId].neighbors.insert(cellDown->tileId);
 			}
+		}
+	}
+}
+Bammi::Tile* Bammi::Board::GetTileAtPosition(Vector2f aPosition)
+{
+	Cell* cell = myGrid.GetCellAtPosition(aPosition);
+	if(cell == nullptr)
+	{
+		return nullptr;
+	}
+
+	return &myTiles[cell->tileId];
+}
+int Bammi::Board::GetTileIndexAtPosition(Vector2f aPosition)
+{
+	Cell* cell = myGrid.GetCellAtPosition(aPosition);
+	if(cell == nullptr)
+	{
+		return -1;
+	}
+	return cell->tileId;
+}
+Bammi::Tile* Bammi::Board::GetTileAtIndex(int aIndex)
+{
+	if(aIndex == -1)
+	{
+		return nullptr;
+	}
+	return &myTiles[aIndex];
+}
+void Bammi::Board::FillTile(TileIndex aIndex, int aPlayerIndex)
+{
+	
+	auto& tile = myTiles[aIndex];
+	tile.fillRate += 1;
+	tile.playerIndex = aPlayerIndex;
+	if(tile.fillRate > tile.neighbors.size())
+	{
+		tile.fillRate = 1;
+		for(auto& tile : tile.neighbors)
+		{
+			FillTile(tile, aPlayerIndex); //turn into stack instead, so you can play it out with an animation
 		}
 	}
 }

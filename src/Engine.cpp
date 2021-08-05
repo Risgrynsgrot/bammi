@@ -58,7 +58,13 @@ void Engine::InitRendering()
     IMG_Init(IMG_INIT_PNG);
 	TTF_Init();
 	//SDL_CreateWindowAndRenderer(512, 512, 0, &window, &renderer);
-	myWindow = SDL_CreateWindow("nice", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080, ::SDL_WINDOW_RESIZABLE);
+	SDL_DisplayMode dm;
+	SDL_GetCurrentDisplayMode(0, &dm);
+	auto width = dm.w;
+	auto height = dm.h;
+	width /= 1.5f;
+	height /= 1.5f;
+	myWindow = SDL_CreateWindow("nice", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, ::SDL_WINDOW_RESIZABLE);
 	myRenderer = SDL_CreateRenderer(myWindow, -1, 0);
 	//myRenderTarget = SDL_CreateRGBSurface(0, 1920, 1080, 32, 0, 0, 0, 0);
 	WindowHandler::GetInstance()->SetWindow(myWindow);

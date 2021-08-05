@@ -22,4 +22,6 @@ target_sources(bammi
 		Primitives.h
 		InputHandler.cpp
 		InputHandler.h
+		PlayerManager.cpp
+		PlayerManager.h
 )
