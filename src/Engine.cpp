@@ -10,6 +10,7 @@
 #endif
 #include "WindowHandler.h"
 #include "Primitives.h"
+#include "InputHandler.h"
 
 bool Engine::Init()
 {
@@ -73,6 +74,19 @@ void Engine::Update()
 	SetDeltaTime();
 	HandleEvents();
 	myGame.Update(myDeltaTime);
+	auto& inputHandler = InputHandler::GetInstance();
+
+	if(inputHandler.GetKeyPressed(SDLK_ESCAPE))
+	{
+		myRunning = false; //REMOVE LATER, JUST FOR DEBUGGING
+	}
+	if(inputHandler.GetKeyPressed(SDLK_F2))
+	{
+		myDebugMode = !myDebugMode;
+		printf("f2 pressed");
+	}
+
+	inputHandler.UpdateState();
 }
 
 void Engine::UpdateDebug()
@@ -92,14 +106,12 @@ void Engine::RenderDebug()
 
 void Engine::ShowMousePos()
 {
-	Vector2i mousePos;
-	SDL_GetMouseState(&mousePos.x, &mousePos.y);
+	auto mousePos = InputHandler::GetInstance().GetMousePosition();
 	char buffer[64];
 	sprintf(buffer, "%d, %d", mousePos.x, mousePos.y);
 	myMousePos.SetText(buffer);
 	myMousePos.SetPosition({mousePos.x + 16.f, mousePos.y - 16.f});
 }
-
 
 void Engine::SetDeltaTime()
 {
@@ -116,40 +128,24 @@ void Engine::Quit()
 	SDL_DestroyRenderer(myRenderer);
 	SDL_DestroyWindow(myWindow);
 	myWindow = nullptr;
-    IMG_Quit();
+	IMG_Quit();
 	TTF_Quit();
 	SDL_Quit();
 }
 
 void Engine::HandleEvents()
 {
-	while(SDL_PollEvent(&myEvent))
+	while (SDL_PollEvent(&myEvent))
 	{
-		switch(myEvent.type)
+		if (InputHandler::GetInstance().UpdateEvents(myEvent))
 		{
-			case SDL_QUIT:
+			continue;
+		}
+		switch (myEvent.type)
+		{
+		case SDL_QUIT:
 			myRunning = false;
 			break;
-			case SDL_KEYDOWN:
-				switch (myEvent.key.keysym.sym)
-				{
-				case SDLK_ESCAPE:
-					myRunning = false; //REMOVE LATER, JUST FOR DEBUGGING
-					break;
-				case SDLK_F1:
-					myDebugMode = true;
-					break;
-				case SDLK_F2:
-					myDebugMode = false; //Turn into toggle later
-					break;
-				}
-				break;
-			case SDL_KEYUP:
-				break;
-			case SDL_MOUSEBUTTONDOWN:
-				break;
-			case SDL_MOUSEBUTTONUP:
-				break;
-			}
+		}
 	}
 }

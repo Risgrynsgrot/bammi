@@ -20,4 +20,6 @@ target_sources(bammi
 		WindowHandler.h
 		Primitives.cpp
 		Primitives.h
+		InputHandler.cpp
+		InputHandler.h
 )
