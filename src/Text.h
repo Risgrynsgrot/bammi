@@ -5,6 +5,13 @@
 
 struct SDL_Renderer;
 
+enum struct TextAlignment
+{
+	Left,
+	Right,
+	Center
+};
+
 class Text
 {
 public:
@@ -12,7 +19,7 @@ public:
 	void SetPosition(Vector2f aPosition);
 	void SetText(const char* aText);
 	void SetColor(float aR, float aG, float aB);
-	void Render(bool aFast);
+	void Render(bool aFast, TextAlignment aAlignment = TextAlignment::Left);
 	void Destroy();
 private:
 	std::string myText = "";
@@ -21,6 +28,6 @@ private:
 	SDL_Texture* myTexture = nullptr;
 	SDL_Color myColor = {255, 255, 255};
 	SDL_Renderer* myRenderer;
-	SDL_FRect myDestRect;
+	SDL_Rect myDestRect;
 	bool myDirty = true;
 };

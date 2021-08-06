@@ -68,12 +68,12 @@ void PlayerManager::RenderWinner(int aPlayerIndex, Vector2f aPosition)
 {
     Player &player = myPlayers[aPlayerIndex];
 
-    player.myText.SetColor(player.myColor.r, player.myColor.g, player.myColor.b);
-    player.myText.SetPosition(aPosition);
+    myWinnerText.SetColor(player.myColor.r, player.myColor.g, player.myColor.b);
+    myWinnerText.SetPosition(aPosition);
     char buffer[128];
     int written = sprintf(buffer, "%s won in %zu moves!", player.myName.c_str(), myMoves.size()); //Add how many tiles you own
-    player.myText.SetText(buffer);
-    player.myText.Render(false);
+    myWinnerText.SetText(buffer);
+    myWinnerText.Render(false, TextAlignment::Center);
 }
 void PlayerManager::RenderPlayerList()
 {
@@ -102,6 +102,7 @@ void PlayerManager::Init(SDL_Renderer *aRenderer, Bammi::Board* aBoard)
 {
     myRenderer = aRenderer;
     myBoard = aBoard;
+    myWinnerText.Init("assets/Hack.ttf", 48, myRenderer);
 }
 void PlayerManager::SetPlayerListPosition(Vector2f aPosition)
 {

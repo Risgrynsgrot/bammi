@@ -11,7 +11,7 @@ void Game::Init(SDL_Renderer* aRenderer)
 
 void Game::Start()
 {
-	myBoard.Init({5, 5}, myRenderer, &myPlayerManager, 64);
+	myBoard.Init({5, 5}, myRenderer, &myPlayerManager, 96);
 
 	myPlayerManager.Init(myRenderer, &myBoard);
 	myPlayerManager.AddPlayer({{0, 1, 0, 1}, "Benjamin"});

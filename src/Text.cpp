@@ -25,15 +25,17 @@ void Text::SetText(const char* aText)
 void Text::Destroy()
 {
 	SDL_DestroyTexture(myTexture);
+	SDL_FreeSurface(mySurface);
 	TTF_CloseFont(myFont);
 }
-void Text::Render(bool aFast)
+void Text::Render(bool aFast, TextAlignment aAlignment)
 {
 	if(myDirty)
 	{
 		if(mySurface != nullptr)
 		{
 			SDL_DestroyTexture(myTexture);
+			SDL_FreeSurface(mySurface);
 		}
 		if(aFast)
 		{
@@ -45,20 +47,28 @@ void Text::Render(bool aFast)
 			printf("dirty slow\n");
 		}
 		myTexture = SDL_CreateTextureFromSurface(myRenderer, mySurface);
-		SDL_FreeSurface(mySurface);
 		Vector2i textureSize;
 		SDL_QueryTexture(myTexture, NULL, NULL, &textureSize.x, &textureSize.y);
 		myDestRect.w = textureSize.x;
 		myDestRect.h = textureSize.y;
 		myDirty = false;
 	}
-	SDL_RenderCopyF(myRenderer, myTexture, NULL, &myDestRect);
+	SDL_Rect rect = myDestRect;
+	if (aAlignment == TextAlignment::Center)
+	{
+		rect.x -= (float)mySurface->w / 2;
+	}
+	if (aAlignment == TextAlignment::Right)
+	{
+		rect.x -= (float)mySurface->w;
+	}
+	SDL_RenderCopy(myRenderer, myTexture, NULL, &rect);
 	Sprite::DRAWCALLS++;
 }
 void Text::SetColor(float aR, float aG, float aB)
 {
 	SDL_Color color = {(Uint8)(aR * 255.f), (Uint8)(aG * 255.f), (Uint8)(aB * 255.f), 1};
-	if(color.r == myColor.r && color.g == myColor.g && color.b == myColor.b)
+	if (color.r == myColor.r && color.g == myColor.g && color.b == myColor.b)
 	{
 		return;
 	}

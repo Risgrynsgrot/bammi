@@ -126,6 +126,12 @@ void Bammi::Board::RenderDebug()
 void Bammi::Board::Reset()
 {
 	myGrid.Clear(Bammi::Cell());
+	myBorders.clear();
+	for (auto& pair : myTiles)
+	{
+		pair.second.text.Destroy();
+	}
+	myTiles.clear();
 	SetupTiles(myRenderer);
 }
 

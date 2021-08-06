@@ -53,4 +53,5 @@ private:
     Bammi::Board* myBoard;
     bool myGameEnded;
     SDL_Renderer* myRenderer;
+    Text myWinnerText;
 };
