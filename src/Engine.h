@@ -15,6 +15,7 @@ public:
 	void Quit();
 private:
 	void ShowMousePos();
+	void ShowFramerate();
 	void InitMainLoop();
 	void InitRendering();
 	void HandleEvents();
@@ -28,5 +29,6 @@ private:
 	bool myRunning;
 	Game myGame;
 	Text myMousePos;
+	Text myFramerate;
 	bool myDebugMode = true;
 };

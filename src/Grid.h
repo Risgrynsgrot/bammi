@@ -8,6 +8,7 @@ public:
 	Grid();
 	void Init(Vector2i aSize, int aGridCellSize, Vector2f aPosition);
 	~Grid();
+	void Clear(const T& aValueToClearTo);
 	T* GetCellAtPosition(float aX, float aY) const;
 	T* GetCellAtPosition(const Vector2f& aPosition) const;
 	T* GetCellAtIndex(int aIndex) const;
@@ -26,7 +27,7 @@ public:
 	inline Vector2f GetCellPosition(int aCellIndex)
 	{
 		Vector2i gridPos = IndexToGridPos(aCellIndex);
-		Vector2f result = {gridPos.x * myCellSize, gridPos.y * myCellSize};
+		Vector2f result = {(float)(gridPos.x * myCellSize), (float)(gridPos.y * myCellSize)};
 		result += myPosition;
 		return result;
 	}
@@ -55,8 +56,17 @@ void Grid<T>::Init(Vector2i aSize, int aGridCellSize, Vector2f aPosition)
 template <typename T>
 Grid<T>::~Grid()
 {
-	delete myData;
+	delete[] myData;
 	myData = nullptr;
+}
+template <typename T>
+void Grid<T>::Clear(const T& aValueToClearTo)
+{
+	for (size_t i = 0; i < mySize.x * mySize.y; i++)
+	{
+		myData[i] = aValueToClearTo;
+	}
+	
 }
 
 template <typename T>

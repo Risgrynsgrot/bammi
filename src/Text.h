@@ -12,7 +12,8 @@ public:
 	void SetPosition(Vector2f aPosition);
 	void SetText(const char* aText);
 	void SetColor(float aR, float aG, float aB);
-	void Render();
+	void Render(bool aFast);
+	void Destroy();
 private:
 	std::string myText = "";
 	TTF_Font* myFont = nullptr;

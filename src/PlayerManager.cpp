@@ -4,19 +4,24 @@
 int PlayerManager::AddPlayer(const Player &aPlayer)
 {
     myPlayers.push_back(aPlayer);
+    myPlayers.back().myText.Init("assets/Hack.ttf", 24, myRenderer);
 
     return myPlayers.size() - 1;
 }
-bool PlayerManager::DoMove(Move aMove)
+MoveResult PlayerManager::DoMove(Move aMove)
 {
     Bammi::Tile* tile = myBoard->GetTileAtIndex(aMove.tile);
     if (tile->playerIndex == -1 || tile->playerIndex == GetCurrentPlayerIndex())
     {
-        myBoard->FillTile(aMove.tile, aMove.player);
+        bool won = myBoard->FillTile(aMove.tile, aMove.player);
         myMoves.push_back(aMove);
-        return true;
+        if(won)
+        {
+            return {true, myCurrentPlayer};
+        }
+        return {true, -1};
     }
-    return false;
+    return {false, -1};
 }
 void PlayerManager::EndTurn()
 {
@@ -25,7 +30,20 @@ void PlayerManager::EndTurn()
     {
         myCurrentPlayer = 0;
     }
-    myTurn++;
+}
+void PlayerManager::EndGame()
+{
+    myGameEnded = true;
+}
+void PlayerManager::Reset()
+{
+    myGameEnded = false;
+    myMoves.clear();
+    for (size_t i = 0; i < myPlayers.size(); i++)
+    {
+        myPlayers[i].myTileCount = 0;
+    }
+    
 }
 Player &PlayerManager::GetCurrentPlayer()
 {
@@ -38,6 +56,24 @@ Player &PlayerManager::GetPlayer(int aIndex)
 void PlayerManager::Render()
 {
     RenderPlayerList();
+    if(myGameEnded)
+    {
+        auto winnerPos = WindowHandler::GetInstance()->GetWindowSize();
+        winnerPos.x /= 2;
+        winnerPos.y = 32;
+        RenderWinner(myCurrentPlayer, {(float)winnerPos.x, (float)winnerPos.y});
+    }
+}
+void PlayerManager::RenderWinner(int aPlayerIndex, Vector2f aPosition)
+{
+    Player &player = myPlayers[aPlayerIndex];
+
+    player.myText.SetColor(player.myColor.r, player.myColor.g, player.myColor.b);
+    player.myText.SetPosition(aPosition);
+    char buffer[128];
+    int written = sprintf(buffer, "%s won in %zu moves!", player.myName.c_str(), myMoves.size()); //Add how many tiles you own
+    player.myText.SetText(buffer);
+    player.myText.Render(false);
 }
 void PlayerManager::RenderPlayerList()
 {
@@ -51,20 +87,20 @@ void PlayerManager::RenderPlayer(int aPlayerIndex, Vector2f aPosition)
 {
     Player &player = myPlayers[aPlayerIndex];
 
-    myText.SetColor(player.myColor.r, player.myColor.g, player.myColor.b);
-    myText.SetPosition(aPosition);
+    player.myText.SetColor(player.myColor.r, player.myColor.g, player.myColor.b);
+    player.myText.SetPosition(aPosition);
     char buffer[128];
-    int written = sprintf(buffer, "%s: ", player.myName.c_str()); //Add how many tiles you own
+    int written = sprintf(buffer, "%s: %d", player.myName.c_str(), player.myTileCount); //Add how many tiles you own
     if (aPlayerIndex == myCurrentPlayer)
     {
         sprintf(buffer + written, " *");
     }
-    myText.SetText(buffer);
-    myText.Render();
+    player.myText.SetText(buffer);
+    player.myText.Render(false);
 }
 void PlayerManager::Init(SDL_Renderer *aRenderer, Bammi::Board* aBoard)
 {
-    myText.Init("assets/hack.ttf", 24, aRenderer);
+    myRenderer = aRenderer;
     myBoard = aBoard;
 }
 void PlayerManager::SetPlayerListPosition(Vector2f aPosition)
@@ -76,7 +112,7 @@ void PlayerManager::Update()
     auto windowSize = WindowHandler::GetInstance()->GetWindowSize();
     windowSize.y /= 2;
     windowSize.x = 32;
-    myPlayerListPosition = {windowSize.x, windowSize.y};
+    myPlayerListPosition = {(float)windowSize.x, (float)windowSize.y};
 }
 int PlayerManager::GetCurrentPlayerIndex()
 {

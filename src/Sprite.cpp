@@ -3,6 +3,8 @@
 #include <iostream>
 #include "ErrorHandler.h"
 
+int Sprite::DRAWCALLS;
+
 void Sprite::Init(const char *aFilePath, SDL_Renderer* aRenderer)
 {
 	assert(aRenderer != nullptr);
@@ -49,6 +51,7 @@ void Sprite::Render()
 	center.x = myCenter.x;
 	center.y = myCenter.y;
 	SDL_RenderCopyExF(myRenderer, myTexture, NULL, &myDestRect, myRotation, &center, SDL_FLIP_NONE); //maybe add flip options if necessary
+	DRAWCALLS++;
 }
 void Sprite::SetColorRGB(float r, float g, float b)
 {

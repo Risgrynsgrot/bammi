@@ -7,6 +7,7 @@ class Sprite
 {
 	friend class PrimitiveDrawer;
 public:
+	static int DRAWCALLS;
 	void Init(const char* aFilePath, SDL_Renderer* aRenderer);
 	Vector2f GetPosition();
 	Vector2f GetSize();

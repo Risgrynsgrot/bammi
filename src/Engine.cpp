@@ -18,6 +18,7 @@ bool Engine::Init()
 	myGame.Init(myRenderer);
 
 	myMousePos.Init("assets/hack.ttf", 14, myRenderer);
+	myFramerate.Init("assets/hack.ttf", 14, myRenderer);
 
 	PrimitiveDrawer::GetInstance().Init(myRenderer);
 
@@ -41,7 +42,10 @@ void Engine::InitMainLoop()
 			UpdateDebug();
 		}
 
+		Sprite::DRAWCALLS = 0;
+
 		Render();
+		//printf("%d", Sprite::DRAWCALLS);
 		if(myDebugMode)
 		{
 			RenderDebug();
@@ -98,6 +102,7 @@ void Engine::Update()
 void Engine::UpdateDebug()
 {
 	ShowMousePos();
+	ShowFramerate();
 }
 
 void Engine::Render()
@@ -108,7 +113,17 @@ void Engine::Render()
 }
 void Engine::RenderDebug()
 {
-	myMousePos.Render();
+	PrimitiveDrawer::GetInstance().DrawRectangle(32.f, 32.f, 500, 16, {0, 0, 0, 1});
+	myMousePos.Render(true);
+	myFramerate.Render(true);
+}
+
+void Engine::ShowFramerate()
+{
+	char buffer[128];
+	sprintf(buffer, "Frametime: %f ms Drawcalls: %d", myDeltaTime * 1000.f, Sprite::DRAWCALLS);
+	myFramerate.SetText(buffer);
+	myFramerate.SetPosition({32, 32});
 }
 
 void Engine::ShowMousePos()

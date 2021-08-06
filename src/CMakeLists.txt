@@ -25,3 +25,6 @@ target_sources(bammi
 		PlayerManager.cpp
 		PlayerManager.h
 )
+
+#add_library(Optick "")
+#add_subdirectory("Optick")

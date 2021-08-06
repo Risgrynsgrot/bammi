@@ -11,11 +11,11 @@ void Game::Init(SDL_Renderer* aRenderer)
 
 void Game::Start()
 {
-	myBoard.Init({5, 5}, myRenderer, &myPlayerManager);
+	myBoard.Init({5, 5}, myRenderer, &myPlayerManager, 64);
 
 	myPlayerManager.Init(myRenderer, &myBoard);
-	myPlayerManager.AddPlayer({{1, 0, 1, 1}, "Benjamin"});
-	myPlayerManager.AddPlayer({{0, 1, 0, 1}, "Lukas"});
+	myPlayerManager.AddPlayer({{0, 1, 0, 1}, "Benjamin"});
+	myPlayerManager.AddPlayer({{0.7, 0.7, 1, 1}, "Matilda"});
 }
 
 void Game::Update(float aDeltaTime)
@@ -26,7 +26,7 @@ void Game::Update(float aDeltaTime)
 	if(input.GetMouseKeyPressed(1))
 	{
 		auto mousePos = input.GetMousePosition();
-		Bammi::Tile* tile = myBoard.GetTileAtPosition({mousePos.x, mousePos.y});
+		Bammi::Tile* tile = myBoard.GetTileAtPosition({(float)mousePos.x, (float)mousePos.y});
 		if(tile == nullptr)
 		{
 			return;
@@ -34,16 +34,26 @@ void Game::Update(float aDeltaTime)
 
 		Move move;
 		move.player = myPlayerManager.GetCurrentPlayerIndex();
-		int tileIndex = myBoard.GetTileIndexAtPosition({mousePos.x, mousePos.y});
+		int tileIndex = myBoard.GetTileIndexAtPosition({(float)mousePos.x, (float)mousePos.y});
 		move.tile = tileIndex;
-		if(tileIndex != -1)
+		if(tileIndex != -1 && !myPlayerManager.GameEnded())
 		{
-			if(myPlayerManager.DoMove(move))
+			MoveResult result = myPlayerManager.DoMove(move);
+			if(result.playerWon != -1)
+			{
+				myPlayerManager.EndGame();
+			}
+			else if(result.validMove)
 			{
 				myPlayerManager.EndTurn();
 			}
 		}
 
+	}
+	if(input.GetKeyPressed(SDLK_r))
+	{
+		myBoard.Reset();
+		myPlayerManager.Reset();
 	}
 }
 

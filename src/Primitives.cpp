@@ -3,7 +3,7 @@
 
 void PrimitiveDrawer::Init(SDL_Renderer* aRenderer)
 {
-	mySprite.Init("assets/whitePixel.bmp", aRenderer);
+	mySprite.Init("assets/whitePixel.png", aRenderer);
 }
 void PrimitiveDrawer::DrawRectangle(SDL_FRect aDstRect, Color aColor)
 {
