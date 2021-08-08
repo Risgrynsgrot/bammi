@@ -55,6 +55,8 @@ void Game::Update(float aDeltaTime)
 		myBoard.Reset();
 		myPlayerManager.Reset();
 	}
+
+
 }
 
 void Game::Render()

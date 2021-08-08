@@ -24,6 +24,12 @@ target_sources(bammi
 		InputHandler.h
 		PlayerManager.cpp
 		PlayerManager.h
+		StreamQuad.cpp
+		StreamQuad.h
+		SpreadEffect.cpp
+		SpreadEffect.h
+		Random.cpp
+		Random.h
 )
 
 #add_library(Optick "")

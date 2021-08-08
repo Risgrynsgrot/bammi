@@ -6,6 +6,7 @@ class WindowHandler
 {
 public:
 	Vector2i GetWindowSize();
+	inline SDL_PixelFormat* GetPixelFormat(){return myPixelFormat;};
 	void SetWindow(SDL_Window* aWindow);
 	static inline WindowHandler* GetInstance()
 	{
@@ -17,5 +18,6 @@ public:
 	};
 private:
 	SDL_Window* myWindow;
+	SDL_PixelFormat* myPixelFormat = nullptr;
 	static WindowHandler* myInstance;
 };

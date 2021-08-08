@@ -11,6 +11,16 @@ void Bammi::Board::Init(Vector2i aBoardSize, SDL_Renderer* aRenderer, PlayerMana
 	myGrid.Init(aBoardSize, aCellSize, {128.f, 128.f});
 	//myRectangle.Init("assets/whitePixel.bmp", aRenderer);
 	//myRectangle.SetSize({cellSize, cellSize});
+	myCellSprites = new StreamQuad[aBoardSize.x * aBoardSize.y];
+	mySpreadEffects = new SpreadEffect[aBoardSize.x * aBoardSize.y];
+	for (size_t i = 0; i < aBoardSize.x * aBoardSize.y; i++)
+	{
+		myCellSprites[i].Init(aRenderer, {aCellSize, aCellSize});
+
+		mySpreadEffects[i].Init({aCellSize, aCellSize}, 4, 1.f);
+		mySpreadEffects[i].StartRandom();
+	}
+
 	myRenderer = aRenderer;
 	SetupTiles(aRenderer);
 }
@@ -19,115 +29,117 @@ void Bammi::Board::Render()
 {
 	DrawTiles();
 	DrawBorders();
-	
+
 	DrawTileText();
-	
 }
 void Bammi::Board::DrawTiles()
 {
 	auto gridSize = myGrid.GetSize();
-	auto& primDraw = PrimitiveDrawer::GetInstance();
+	auto &primDraw = PrimitiveDrawer::GetInstance();
 
-	for (int y = 0; y < gridSize.y; y++)
+	for (size_t i = 0; i < gridSize.x * gridSize.y; i++)
 	{
-		for (int x = 0; x < gridSize.x; x++)
+		Cell *cell = myGrid.GetCellAtIndex(i);
+		if (cell->hovered)
 		{
-			Cell* cell = myGrid.GetCellAtGridPos(x, y);
-			auto playerOwned = myTiles[cell->tileId].playerIndex;
-			Color color = playerOwned != -1 ? myPlayerManager->GetPlayer(playerOwned).myColor : Color();
-			if(cell->hovered)
-			{
-				color.r *= 0.7f;
-				color.g *= 0.7f;
-				color.b *= 0.7f;
-			}
-			auto cellSize = myGrid.GetCellSize();
-			Vector2f cellPos(x * cellSize, y * cellSize);
-			cellPos += myGrid.GetPosition();
-			primDraw.DrawRectangle(cellPos, {(float)cellSize, (float)cellSize}, color);
-			//myRectangle.SetPosition(cellPos);
-			//myRectangle.Render();
-			//myRectangle.SetColorRGB(1.f, 1.f, 1.f);
-
-			//if((cell->myBorder & (int)Border::right))
-			//{
-			//	primDraw.DrawLine({cellPos.x + cellSize, cellPos.y}, {cellPos.x + cellSize, cellPos.y + cellSize}, 2.f, {1,0,1,1});
-			//}
-			//if((cell->myBorder & (int)Border::left))
-			//{
-			//	primDraw.DrawLine({cellPos.x, cellPos.y}, {cellPos.x, cellPos.y + cellSize}, 2.f, {1,0,1,1});
-			//}
-			//if((cell->myBorder & (int)Border::up))
-			//{
-			//	primDraw.DrawLine({cellPos.x, cellPos.y}, {cellPos.x + cellSize, cellPos.y}, 2.f, {1,0,1,1});
-			//}
-			//if((cell->myBorder & (int)Border::down))
-			//{
-			//	primDraw.DrawLine({cellPos.x, cellPos.y + cellSize}, {cellPos.x + cellSize, cellPos.y + cellSize}, 2.f, {1,0,1,1});
-			//}
-
-
+			myCellSprites[i].SetColorRGB(0.7f, 0.7f, 0.7f);
 		}
+
+		Vector2i boardSize = myGrid.GetSize();
+		Vector2f cellPos(i % boardSize.x, i / boardSize.x);
+		cellPos *= (float)myGrid.GetCellSize();
+		cellPos += myGrid.GetPosition();
+		myCellSprites[i].SetPosition(cellPos);
+		myCellSprites[i].SetRotation(0.f);
+
+		myCellSprites[i].Render();
+		myCellSprites[i].SetColorRGB(1.f, 1.f, 1.f);
 	}
+
+	//for (int y = 0; y < gridSize.y; y++)
+	//{
+	//	for (int x = 0; x < gridSize.x; x++)
+	//	{
+	//		Cell* cell = myGrid.GetCellAtGridPos(x, y);
+	//		auto playerOwned = myTiles[cell->tileId].playerIndex;
+	//		Color color = playerOwned != -1 ? myPlayerManager->GetPlayer(playerOwned).myColor : Color();
+	//		if(cell->hovered)
+	//		{
+	//			color.r *= 0.7f;
+	//			color.g *= 0.7f;
+	//			color.b *= 0.7f;
+	//		}
+	//		auto cellSize = myGrid.GetCellSize();
+	//		Vector2f cellPos(x * cellSize, y * cellSize);
+	//		cellPos += myGrid.GetPosition();
+	//		primDraw.DrawRectangle(cellPos, {(float)cellSize, (float)cellSize}, color);
+	//	}
+	//}
 }
 void Bammi::Board::DrawTileText()
 {
-	for (auto& pair : myTiles)
+	for (auto &pair : myTiles)
 	{
-		auto& tile = pair.second;
+		auto &tile = pair.second;
 
-		Cell* tileCell = myGrid.GetCellAtIndex(tile.cells[0]);
+		Cell *tileCell = myGrid.GetCellAtIndex(tile.cells[0]);
 
 		tile.text.SetPosition(myGrid.GetCellPosition(tile.cells[0]));
 		char buffer[64];
 		sprintf(buffer, "%d / %d", tile.fillRate, (int)tile.neighbors.size());
 		tile.text.SetText(buffer);
-		tile.text.SetColor(0.f,0.f,0.f);
+		tile.text.SetColor(0.f, 0.f, 0.f);
 		tile.text.Render(false); //REALLY SLOW, TEXT IS NO GOOD HAHAHA
 	}
 }
 void Bammi::Board::DrawBorders()
 {
 	auto gridSize = myGrid.GetSize();
-	auto& primDraw = PrimitiveDrawer::GetInstance();
+	auto &primDraw = PrimitiveDrawer::GetInstance();
 	for (size_t i = 0; i < myBorders.size(); i++)
 	{
-		Line& line = myBorders[i];
+		Line &line = myBorders[i];
 
-		primDraw.DrawLine(line.from + myGrid.GetPosition(), line.to + myGrid.GetPosition(), 2.f, {0,0,0,1});
+		primDraw.DrawLine(line.from + myGrid.GetPosition(), line.to + myGrid.GetPosition(), 2.f, {0, 0, 0, 1});
 	}
 }
 
 void Bammi::Board::RenderDebug()
 {
 	auto gridSize = myGrid.GetSize();
-//	myTileIdText.SetColor(0, 0, 0);
-//	for (int y = 0; y < gridSize.y; y++)
-//	{
-//		for (int x = 0; x < gridSize.x; x++)
-//		{
-//			Cell* cell = myGrid.GetCellAtGridPos(x, y);
-//			Vector2f cellPos(x * myGrid.GetCellSize(), y * myGrid.GetCellSize());
-//			cellPos += myGrid.GetPosition();
-//			myTileIdText.SetPosition(cellPos);
-//			char buffer[64];
-//			sprintf(buffer, "%d", cell->tileId);
-//			myTileIdText.SetText(buffer);
-//			myTileIdText.Render();
-//		}
-//	}
-
+	//	myTileIdText.SetColor(0, 0, 0);
+	//	for (int y = 0; y < gridSize.y; y++)
+	//	{
+	//		for (int x = 0; x < gridSize.x; x++)
+	//		{
+	//			Cell* cell = myGrid.GetCellAtGridPos(x, y);
+	//			Vector2f cellPos(x * myGrid.GetCellSize(), y * myGrid.GetCellSize());
+	//			cellPos += myGrid.GetPosition();
+	//			myTileIdText.SetPosition(cellPos);
+	//			char buffer[64];
+	//			sprintf(buffer, "%d", cell->tileId);
+	//			myTileIdText.SetText(buffer);
+	//			myTileIdText.Render();
+	//		}
+	//	}
 
 	Vector2i mousePos;
 	SDL_GetMouseState(&mousePos.x, &mousePos.y);
 	Vector2i windowCenter = WindowHandler::GetInstance()->GetWindowSize() / 2;
-	PrimitiveDrawer::GetInstance().DrawLine({(float)mousePos.x, (float)mousePos.y}, {(float)windowCenter.x, (float)windowCenter.y},  8, {1,0,1,1});
+	PrimitiveDrawer::GetInstance().DrawLine({(float)mousePos.x, (float)mousePos.y}, {(float)windowCenter.x, (float)windowCenter.y}, 8, {1, 0, 1, 1});
 }
 void Bammi::Board::Reset()
 {
+	for (size_t i = 0; i < myGrid.GetSize().x * myGrid.GetSize().y; i++)
+	{
+		myCellSprites[i].SetTextureColor(1,1,1);
+		mySpreadEffects[i].Reset();
+		mySpreadEffects[i].SetColor({1,1,1});
+	}
+	
 	myGrid.Clear(Bammi::Cell());
 	myBorders.clear();
-	for (auto& pair : myTiles)
+	for (auto &pair : myTiles)
 	{
 		pair.second.text.Destroy();
 	}
@@ -150,6 +162,9 @@ void Bammi::Board::Update(float aDeltaTime)
 	{
 		for (int x = 0; x < gridSize.x; x++)
 		{
+			int index = (y * gridSize.x) + x;
+			mySpreadEffects[index].Update(aDeltaTime, myCellSprites[index]);
+
 			Cell *cell = myGrid.GetCellAtGridPos(x, y);
 			cell->hovered = false;
 		}
@@ -168,7 +183,7 @@ void Bammi::Board::Update(float aDeltaTime)
 	}
 }
 
-void Bammi::Board::SetupTiles(SDL_Renderer* aRenderer)
+void Bammi::Board::SetupTiles(SDL_Renderer *aRenderer)
 {
 	//Some kind of random flood fill
 
@@ -290,13 +305,13 @@ void Bammi::Board::SetupTiles(SDL_Renderer* aRenderer)
 		for (int x = 0; x < myGrid.GetSize().x; x++)
 		{
 			Cell *cell = myGrid.GetCellAtGridPos(x, y);
-			if(cell->myBorder & (int)Border::down)
+			if (cell->myBorder & (int)Border::down)
 			{
 				line->to.x += myGrid.GetCellSize();
 				continue;
 			}
 
-			if(line->to.x != line->from.x)
+			if (line->to.x != line->from.x)
 			{
 				myBorders.push_back(Line());
 				line = &myBorders.back();
@@ -315,13 +330,13 @@ void Bammi::Board::SetupTiles(SDL_Renderer* aRenderer)
 		for (int y = 0; y < myGrid.GetSize().y; y++)
 		{
 			Cell *cell = myGrid.GetCellAtGridPos(x, y);
-			if(cell->myBorder & (int)Border::right)
+			if (cell->myBorder & (int)Border::right)
 			{
 				line->to.y += myGrid.GetCellSize();
 				continue;
 			}
 
-			if(line->to.y != line->from.y)
+			if (line->to.y != line->from.y)
 			{
 				myBorders.push_back(Line());
 				line = &myBorders.back();
@@ -367,8 +382,10 @@ bool Bammi::Board::FillTile(TileIndex aIndex, int aPlayerIndex)
 	}
 	auto &tile = myTiles[aIndex];
 	tile.fillRate += 1;
+	bool spread = false;
 	if (tile.playerIndex != aPlayerIndex)
 	{
+		spread = true;
 		player.myTileCount++;
 		if (tile.playerIndex != -1)
 		{
@@ -377,6 +394,10 @@ bool Bammi::Board::FillTile(TileIndex aIndex, int aPlayerIndex)
 		}
 	}
 	tile.playerIndex = aPlayerIndex;
+	if(spread)
+	{
+		StartTileSpread(aIndex);
+	}
 	if (tile.fillRate > tile.neighbors.size())
 	{
 		tile.fillRate = 1;
@@ -389,4 +410,13 @@ bool Bammi::Board::FillTile(TileIndex aIndex, int aPlayerIndex)
 		}
 	}
 	return false;
+}
+void Bammi::Board::StartTileSpread(int aTileIndex)
+{
+	auto &tile = myTiles[aTileIndex];
+	for (auto &cell : tile.cells)
+	{
+		mySpreadEffects[cell].Reset();
+		mySpreadEffects[cell].SetColor(myPlayerManager->GetPlayer(tile.playerIndex).myColor);
+	}
 }

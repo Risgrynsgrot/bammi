@@ -4,6 +4,8 @@
 #include "Sprite.h"
 #include <vector>
 #include "Text.h"
+#include "StreamQuad.h"
+#include "SpreadEffect.h"
 
 class PlayerManager;
 
@@ -56,10 +58,13 @@ namespace Bammi
 		void DrawTiles();
 		void DrawBorders();
 		void DrawTileText();
+		void StartTileSpread(int aTileIndex);
 		void SetupTiles(SDL_Renderer* aRenderer);
 		Grid<Cell> myGrid;
 		robin_hood::unordered_node_map<TileIndex, Tile> myTiles;
-		Sprite myRectangle;
+		//Sprite myRectangle;
+		StreamQuad* myCellSprites;
+		SpreadEffect* mySpreadEffects;
 		PlayerManager* myPlayerManager;
 		std::vector<Line> myBorders;
 		SDL_Renderer* myRenderer;

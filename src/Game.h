@@ -5,6 +5,8 @@
 #include "BammiBoard.h"
 #include "Text.h"
 #include "PlayerManager.h"
+#include "StreamQuad.h"
+#include "SpreadEffect.h"
 
 class Game
 {

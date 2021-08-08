@@ -11,9 +11,11 @@
 #include "WindowHandler.h"
 #include "Primitives.h"
 #include "InputHandler.h"
+#include "Random.h"
 
 bool Engine::Init()
 {
+	Random::GetInstance().Init();
 	InitRendering();
 	myGame.Init(myRenderer);
 

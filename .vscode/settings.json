@@ -1,6 +1,7 @@
 {
 	"files.associations": {
 		"*.rh": "cpp",
-		"xstring": "cpp"
+		"xstring": "cpp",
+		"random": "cpp"
 	}
 }
