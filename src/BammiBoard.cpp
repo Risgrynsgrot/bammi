@@ -432,7 +432,7 @@ void Bammi::Board::HandleExplodingTile()
 
 	tile.fillRate -= tile.neighbors.size();
 	UpdateTileFill(myExplodingTiles.front());
-	StartTileSpread(myExplodingTiles.front(), true, false);
+	StartTileSpread(myExplodingTiles.front(), true, true);
 
 	for (auto &neighTile : tile.neighbors)
 	{
@@ -530,5 +530,6 @@ void Bammi::Board::UpdateTileFill(int aTileIndex)
 		float percentage = (float)tile.fillRate / tile.neighbors.size();
 		//printf("fillRate: %f\n", percentage);
 		mySpreadEffects[cell].SetFillPercentage(percentage);
+		mySpreadEffects[cell].SetDrawReverse(false);
 	}
 }

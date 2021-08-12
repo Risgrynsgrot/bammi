@@ -20,7 +20,11 @@ void SpreadEffect::Init(Vector2i aSize, int aPixelSize, float aSpreadTime)
 }
 bool SpreadEffect::FinishedDrawing() 
 {
-    return myDrawnPixels >= myPixelCount;
+    if(myDrawReverse)
+    {
+        return myDrawIndex <= 0;
+    }
+    return myDrawIndex >= myPixelCount;
 };
 void SpreadEffect::Update(float aDeltaTime, StreamQuad& aQuad)
 {
@@ -137,7 +141,7 @@ void SpreadEffect::ColorNextPixel(StreamQuad &aQuad)
     Uint32 *pixels = (Uint32 *)aQuad.GetPixels();
     auto format = WindowHandler::GetInstance()->GetPixelFormat();
     Uint32 color = SDL_MapRGB(format, myColor.r * 255, myColor.g * 255, myColor.b * 255);
-    Uint32 coverColor = SDL_MapRGB(format, 255, 0, 0);
+    Uint32 coverColor = SDL_MapRGB(format, 255, 255, 255);
     int effectPixel = GetNextPixelToColor();
     //effectPixel *= myPixelSize;
     if (effectPixel >= 0)
@@ -155,12 +159,12 @@ void SpreadEffect::ColorNextPixel(StreamQuad &aQuad)
             }
         }
     }
-    myDrawnPixels++;
+    //myDrawnPixels++;
     aQuad.UnlockTexture();
 }
 int SpreadEffect::GetNextPixelToColor()
 {
-    if(myDrawnPixels >= myPixelCount)
+    if(FinishedDrawing())
     {
         return -1;
     }
@@ -191,14 +195,18 @@ void SpreadEffect::Reset(bool aReverse)
     if(aReverse)
     {
         myDrawReverse = true;
-        myDrawnPixels = 0;
+        //myDrawnPixels = 0;
         myDrawIndex = myPixelCount - 1;
         return;
     }
     myDrawReverse = false;
-    myDrawnPixels = 0;
+    //myDrawnPixels = 0;
     myDrawIndex = 0;
 
+}
+void SpreadEffect::SetDrawReverse(bool aReverse)
+{
+    myDrawReverse = aReverse;
 }
 void SpreadEffect::DrawCircle(int32_t centreX, int32_t centreY, int32_t radius)
 {

@@ -35,6 +35,21 @@ void InputHandler::UpdateState()
 			myKeyStatuses[key] = KeyStatus::Up;
 		}
     }
+
+    for (auto& pair : myMouseKeyStatuses)
+    {
+        auto& key = pair.first;
+        auto& status = pair.second;
+		if (status == KeyStatus::Pressed)
+		{
+			myMouseKeyStatuses[key] = KeyStatus::Down;
+            continue;
+		}
+		if (status == KeyStatus::Released)
+		{
+			myMouseKeyStatuses[key] = KeyStatus::Up;
+		}
+    }
     
 }
 void InputHandler::HandleKeyDownEvent(SDL_Keycode aKeyCode)

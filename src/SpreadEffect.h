@@ -24,6 +24,7 @@ public:
     void ColorNextPixel(StreamQuad& aQuad);
     inline int GetTotalPixelsToDraw() {return myPixelCount;};
     bool FinishedDrawing();
+    void SetDrawReverse(bool aReverse);
 private:
     void DrawCircle(int32_t centreX, int32_t centreY, int32_t radius);
     int VecToIndex(Vector2i aPosition);
@@ -44,5 +45,5 @@ private:
     float myFillPercentage = 0.f;
     int myFillIndex = 0;
     bool myDrawReverse = false;
-    int myDrawnPixels = 0;
+    //int myDrawnPixels = 0;
 };

@@ -15,7 +15,7 @@ void Game::Start()
 
 	myPlayerManager.Init(myRenderer, &myBoard);
 	myPlayerManager.AddPlayer({{1, 1, 0, 1}, "Benjamin"});
-	//myPlayerManager.AddPlayer({{0.7, 0.7, 1, 1}, "Matilda"});
+	myPlayerManager.AddPlayer({{0.7, 0.7, 1, 1}, "Matilda"});
 	//myPlayerManager.AddPlayer({{0, 1, 0, 1}, "Alve"});
 	//myPlayerManager.AddPlayer({{1, 0, 0, 1}, "Kirsi"});
 	//myPlayerManager.AddPlayer({{0, 0, 0.3, 1}, "Rickard"});
