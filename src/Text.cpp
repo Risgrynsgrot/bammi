@@ -44,7 +44,7 @@ void Text::Render(bool aFast, TextAlignment aAlignment)
 		else
 		{
 			mySurface = TTF_RenderText_Blended(myFont, myText.c_str(), myColor);
-			printf("dirty slow\n");
+			//printf("dirty slow\n");
 		}
 		myTexture = SDL_CreateTextureFromSurface(myRenderer, mySurface);
 		Vector2i textureSize;

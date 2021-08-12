@@ -12,14 +12,19 @@ void SpreadEffect::Init(Vector2i aSize, int aPixelSize, float aSpreadTime)
     myPixelCount = myScaledSize.x * myScaledSize.y;
     myColored = new bool[myPixelCount];
     memset(myColored, 0, myPixelCount);
+    myDrawIndex = 0;
 
     mySpreadTimer = aSpreadTime;
 	mySpreadDelay = mySpreadTimer / GetTotalPixelsToDraw();
     myCurrentSpreadTime = mySpreadDelay;
 }
+bool SpreadEffect::FinishedDrawing() 
+{
+    return myDrawnPixels >= myPixelCount;
+};
 void SpreadEffect::Update(float aDeltaTime, StreamQuad& aQuad)
 {
-    if(myDrawIndex > myPixelCount)
+    if(FinishedDrawing())
     {
         return;
     }
@@ -34,6 +39,12 @@ void SpreadEffect::Update(float aDeltaTime, StreamQuad& aQuad)
 		}
 		myCurrentSpreadTime = mySpreadDelay;
 	}
+}
+void SpreadEffect::SetFillPercentage(float aPercentage)
+{
+    myDrawIndex = myFillIndex;
+    myFillPercentage = aPercentage;
+    myFillIndex = myPixelCount * aPercentage;
 }
 void SpreadEffect::StartFloodFill(Vector2i aPosition)
 {
@@ -110,6 +121,8 @@ void SpreadEffect::StartCircle(Vector2i aPosition)
 
 void SpreadEffect::StartRandom()
 {
+    myPixelsToDraw.clear();
+    myReversePixelsToDraw.clear();
     myPixelsToDraw.reserve(myPixelCount);
     for (size_t i = 0; i < myPixelCount; i++)
     {
@@ -124,6 +137,7 @@ void SpreadEffect::ColorNextPixel(StreamQuad &aQuad)
     Uint32 *pixels = (Uint32 *)aQuad.GetPixels();
     auto format = WindowHandler::GetInstance()->GetPixelFormat();
     Uint32 color = SDL_MapRGB(format, myColor.r * 255, myColor.g * 255, myColor.b * 255);
+    Uint32 coverColor = SDL_MapRGB(format, 255, 0, 0);
     int effectPixel = GetNextPixelToColor();
     //effectPixel *= myPixelSize;
     if (effectPixel >= 0)
@@ -132,15 +146,21 @@ void SpreadEffect::ColorNextPixel(StreamQuad &aQuad)
         {
             for (size_t x = 0; x < myPixelSize; x++)
             {
-                pixels[effectPixel + VecToPixelIndex({x, y})] = color;
+                if((float)myDrawIndex / myPixelCount > myFillPercentage)
+                {
+                    pixels[effectPixel + VecToPixelIndex({x, y})] = coverColor; 
+                    continue;
+                }
+                pixels[effectPixel + VecToPixelIndex({x, y})] = color; 
             }
         }
     }
+    myDrawnPixels++;
     aQuad.UnlockTexture();
 }
 int SpreadEffect::GetNextPixelToColor()
 {
-    if (myDrawIndex >= myPixelsToDraw.size())
+    if(myDrawnPixels >= myPixelCount)
     {
         return -1;
     }
@@ -150,6 +170,11 @@ int SpreadEffect::GetNextPixelToColor()
     x *= myPixelSize;
     y *= myPixelSize;
     id = VecToPixelIndex({x, y});
+    if(myDrawReverse)
+    {
+        myDrawIndex--;
+        return id;
+    }
     myDrawIndex++;
     return id;
 }
@@ -161,9 +186,19 @@ int SpreadEffect::VecToPixelIndex(Vector2i aPosition)
 {
     return (aPosition.y * myImagePixelSize.x) + aPosition.x;
 }
-void SpreadEffect::Reset()
+void SpreadEffect::Reset(bool aReverse)
 {
+    if(aReverse)
+    {
+        myDrawReverse = true;
+        myDrawnPixels = 0;
+        myDrawIndex = myPixelCount - 1;
+        return;
+    }
+    myDrawReverse = false;
+    myDrawnPixels = 0;
     myDrawIndex = 0;
+
 }
 void SpreadEffect::DrawCircle(int32_t centreX, int32_t centreY, int32_t radius)
 {
@@ -205,4 +240,8 @@ void SpreadEffect::DrawCircle(int32_t centreX, int32_t centreY, int32_t radius)
 void SpreadEffect::SetColor(Color aColor)
 {
     myColor = aColor;
+}
+bool SpreadEffect::ShouldFillReverse()
+{
+    return myDrawIndex / myPixelCount > myFillPercentage;
 }

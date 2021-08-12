@@ -13,7 +13,8 @@ MoveResult PlayerManager::DoMove(Move aMove)
     Bammi::Tile* tile = myBoard->GetTileAtIndex(aMove.tile);
     if (tile->playerIndex == -1 || tile->playerIndex == GetCurrentPlayerIndex())
     {
-        bool won = myBoard->FillTile(aMove.tile, aMove.player);
+        myBoard->AddToTileQueue(aMove.tile, aMove.player, false, true);
+        bool won = false;
         myMoves.push_back(aMove);
         if(won)
         {
@@ -31,8 +32,9 @@ void PlayerManager::EndTurn()
         myCurrentPlayer = 0;
     }
 }
-void PlayerManager::EndGame()
+void PlayerManager::EndGame(int aPlayerIndex)
 {
+    myCurrentPlayer = aPlayerIndex;
     myGameEnded = true;
 }
 void PlayerManager::Reset()

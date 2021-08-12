@@ -18,23 +18,31 @@ public:
     void StartFloodFill(Vector2i aPosition);
     void StartCircle(Vector2i aPosition);
     void StartRandom();
-    void Reset();
+    void SetFillPercentage(float aPercentage);
+    void Reset(bool aReverse);
     int GetNextPixelToColor();
     void ColorNextPixel(StreamQuad& aQuad);
     inline int GetTotalPixelsToDraw() {return myPixelCount;};
-private:   
+    bool FinishedDrawing();
+private:
     void DrawCircle(int32_t centreX, int32_t centreY, int32_t radius);
     int VecToIndex(Vector2i aPosition);
     int VecToPixelIndex(Vector2i aPosition);
+    bool ShouldFillReverse();
     int myPixelSize;
     int myPixelCount;
     Vector2i myScaledSize;
     Vector2i myImagePixelSize;
     std::vector<int> myPixelsToDraw;
+    std::vector<int> myReversePixelsToDraw;
     int myDrawIndex;
     bool* myColored;
 	float mySpreadTimer = 1.f;
 	float myCurrentSpreadTime;
 	float mySpreadDelay;
     Color myColor;
+    float myFillPercentage = 0.f;
+    int myFillIndex = 0;
+    bool myDrawReverse = false;
+    int myDrawnPixels = 0;
 };

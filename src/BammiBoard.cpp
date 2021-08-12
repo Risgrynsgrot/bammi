@@ -133,7 +133,7 @@ void Bammi::Board::Reset()
 	for (size_t i = 0; i < myGrid.GetSize().x * myGrid.GetSize().y; i++)
 	{
 		myCellSprites[i].SetTextureColor(1,1,1);
-		mySpreadEffects[i].Reset();
+		mySpreadEffects[i].Reset(false);
 		mySpreadEffects[i].SetColor({1,1,1});
 	}
 	
@@ -180,6 +180,52 @@ void Bammi::Board::Update(float aDeltaTime)
 		{
 			myGrid.GetCellAtIndex(hoveredCells[i])->hovered = true;
 		}
+	}
+
+	if(!myUnHandledMoves.empty())
+	{
+
+		auto& current = myUnHandledMoves.back();
+		auto cellIndex = myTiles[current.aIndex].cells[0];
+		if(mySpreadEffects[cellIndex].FinishedDrawing())
+		{
+			myUnHandledMoves.clear();
+			HandleExplodingTile();
+		}
+	
+
+		//auto& current = myMoveQueue.front();
+		//auto cellIndex = myTiles[current.aIndex].cells[0];
+		//if(mySpreadEffects[cellIndex].FinishedDrawing())
+		//{
+			//myMoveQueue.pop();
+
+			//int spread = 0;
+			//if(!myMoveQueue.empty())
+			//{
+				//current = myMoveQueue.front();
+				//spread = current.aSpreadAmount;
+				//for (size_t i = 0; i < spread; i++)
+				//{
+					//current = myMoveQueue.front();
+					//FillTile2(current.aIndex, current.aPlayerIndex, current.aIsExplode);
+					//myMoveQueue.pop();
+					//printf("current: %llu\n", myMoveQueue.size());
+				//}
+			//}
+				
+		//}
+	}
+}
+void Bammi::Board::AddToTileQueue(TileIndex aIndex, int aPlayerIndex, bool aIsExplode, bool aFirst, int aSpreadAmount)
+{
+	myUnHandledMoves.push_back({aIndex, aPlayerIndex, aIsExplode, aSpreadAmount});
+	if(aFirst)
+	{
+		//myTiles[aIndex].playerIndex = aPlayerIndex;
+		//UpdateTileFill(aIndex);
+		//StartTileSpread(aIndex, true);
+		FillTile2(aIndex, aPlayerIndex, aIsExplode);
 	}
 }
 
@@ -373,7 +419,28 @@ Bammi::Tile *Bammi::Board::GetTileAtIndex(int aIndex)
 	}
 	return &myTiles[aIndex];
 }
-bool Bammi::Board::FillTile(TileIndex aIndex, int aPlayerIndex)
+
+void Bammi::Board::HandleExplodingTile()
+{
+	if(myExplodingTiles.empty())
+	{
+		return;
+	}
+
+	auto &tile = myTiles[myExplodingTiles.front()];
+	auto playerIndex = tile.playerIndex;
+
+	tile.fillRate -= tile.neighbors.size();
+	UpdateTileFill(myExplodingTiles.front());
+	StartTileSpread(myExplodingTiles.front(), true, false);
+
+	for (auto &neighTile : tile.neighbors)
+	{
+		AddToTileQueue(neighTile, playerIndex, true, true, tile.neighbors.size());
+	}
+	myExplodingTiles.pop();
+}
+bool Bammi::Board::FillTile2(TileIndex aIndex, int aPlayerIndex, bool aIsExplode)
 {
 	auto &player = myPlayerManager->GetPlayer(aPlayerIndex);
 	if (player.myTileCount >= myTiles.size())
@@ -381,8 +448,12 @@ bool Bammi::Board::FillTile(TileIndex aIndex, int aPlayerIndex)
 		return true;
 	}
 	auto &tile = myTiles[aIndex];
-	tile.fillRate += 1;
+	tile.fillRate++;
 	bool spread = false;
+	if(tile.fillRate > tile.neighbors.size())
+	{
+		myExplodingTiles.push(aIndex);
+	}
 	if (tile.playerIndex != aPlayerIndex)
 	{
 		spread = true;
@@ -394,29 +465,70 @@ bool Bammi::Board::FillTile(TileIndex aIndex, int aPlayerIndex)
 		}
 	}
 	tile.playerIndex = aPlayerIndex;
-	if(spread)
+	UpdateTileFill(aIndex);
+	if (spread)
 	{
-		StartTileSpread(aIndex);
-	}
-	if (tile.fillRate > tile.neighbors.size())
-	{
-		tile.fillRate = 1;
-		for (auto &tile : tile.neighbors)
-		{
-			if (FillTile(tile, aPlayerIndex))
-			{
-				return true;
-			} //turn into stack instead, so you can play it out with an animation
-		}
+		StartTileSpread(aIndex, true, false);
 	}
 	return false;
 }
-void Bammi::Board::StartTileSpread(int aTileIndex)
+
+//bool Bammi::Board::FillTile(TileIndex aIndex, int aPlayerIndex)
+//{
+	//auto &player = myPlayerManager->GetPlayer(aPlayerIndex);
+	//if (player.myTileCount >= myTiles.size())
+	//{
+		//return true;
+	//}
+	//auto &tile = myTiles[aIndex];
+	//tile.fillRate += 1;
+	//UpdateTileFill(aIndex);
+	//bool spread = false; //This is whats messing things up
+	//if (tile.playerIndex != aPlayerIndex)
+	//{
+		//spread = true;
+		//player.myTileCount++;
+		//if (tile.playerIndex != -1)
+		//{
+			//auto &other = myPlayerManager->GetPlayer(tile.playerIndex);
+			//other.myTileCount--;
+		//}
+	//}
+	//tile.playerIndex = aPlayerIndex;
+	//if (spread)
+	//{
+		//StartTileSpread(aIndex, true);
+	//}
+	//if (tile.fillRate > tile.neighbors.size())
+	//{
+		//tile.fillRate = 1;
+		//UpdateTileFill(aIndex);
+		//for (auto &tile : tile.neighbors)
+		//{
+			//myMoveQueue.push({tile, aPlayerIndex});
+		//}
+	//}
+	//return false;
+//}
+void Bammi::Board::StartTileSpread(int aTileIndex, bool aShouldReset, bool aReverse)
 {
 	auto &tile = myTiles[aTileIndex];
 	for (auto &cell : tile.cells)
 	{
-		mySpreadEffects[cell].Reset();
+		if (aShouldReset)
+		{
+			mySpreadEffects[cell].Reset(aReverse);
+		}
 		mySpreadEffects[cell].SetColor(myPlayerManager->GetPlayer(tile.playerIndex).myColor);
+	}
+}
+void Bammi::Board::UpdateTileFill(int aTileIndex)
+{
+	auto &tile = myTiles[aTileIndex];
+	for (auto &cell : tile.cells)
+	{
+		float percentage = (float)tile.fillRate / tile.neighbors.size();
+		//printf("fillRate: %f\n", percentage);
+		mySpreadEffects[cell].SetFillPercentage(percentage);
 	}
 }

@@ -32,7 +32,7 @@ public:
     int AddPlayer(const Player& aPlayer);
     MoveResult DoMove(Move aMove);
     void EndTurn();
-    void EndGame();
+    void EndGame(int aPlayerIndex);
     void Reset();
     Player& GetCurrentPlayer();
     int GetCurrentPlayerIndex();
@@ -41,6 +41,7 @@ public:
     void Update();
     void SetPlayerListPosition(Vector2f aPosition);
     inline bool GameEnded() {return myGameEnded;};
+    int GetPlayerCount() {return myPlayers.size();};
 private:
     void RenderWinner(int aPlayerIndex, Vector2f aPosition);
     void RenderPlayer(int aPlayerIndex, Vector2f aPosition);
