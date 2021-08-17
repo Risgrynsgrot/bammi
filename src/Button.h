@@ -2,6 +2,7 @@
 #include <functional>
 #include "Vector2.h"
 #include "Text.h"
+#include "Sprite.h"
 
 class Button
 {
@@ -16,4 +17,5 @@ private:
 	Vector2f mySize;
 	std::function<void()> myOnClick;
 	Text myText;
+	Sprite mySprite;
 };
