@@ -28,7 +28,7 @@ void Text::Destroy()
 	SDL_FreeSurface(mySurface);
 	TTF_CloseFont(myFont);
 }
-void Text::Render(bool aFast, TextAlignment aAlignment)
+void Text::Render(bool aFast, TextAlignment aAlignment, TextOrigin aOrigin)
 {
 	if(myDirty)
 	{
@@ -61,6 +61,14 @@ void Text::Render(bool aFast, TextAlignment aAlignment)
 	if (aAlignment == TextAlignment::Right)
 	{
 		rect.x -= (float)mySurface->w;
+	}
+	if(aOrigin == TextOrigin::Mid)
+	{
+		rect.y -= (float)mySurface->h / 2;
+	}
+	if(aOrigin == TextOrigin::Bottom)
+	{
+		rect.y -= (float)mySurface->h;
 	}
 	SDL_RenderCopy(myRenderer, myTexture, NULL, &rect);
 	Sprite::DRAWCALLS++;

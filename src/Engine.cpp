@@ -12,11 +12,13 @@
 #include "Primitives.h"
 #include "InputHandler.h"
 #include "Random.h"
+#include "UIStateHandler.h"
 
 bool Engine::Init()
 {
 	Random::GetInstance().Init();
 	InitRendering();
+	UIStateHandler::GetInstance().Init(myRenderer);
 	myGame.Init(myRenderer);
 
 	myMousePos.Init("assets/hack.ttf", 14, myRenderer);
@@ -85,6 +87,7 @@ void Engine::Update()
 {
 	SetDeltaTime();
 	HandleEvents();
+	UIStateHandler::GetInstance().Update(myDeltaTime);
 	myGame.Update(myDeltaTime);
 	auto& inputHandler = InputHandler::GetInstance();
 
@@ -112,6 +115,7 @@ void Engine::Render()
 	SDL_SetRenderDrawColor(myRenderer, 41, 40, 40, 255);
 	SDL_RenderClear(myRenderer);
 	myGame.Render();
+	UIStateHandler::GetInstance().Render();
 }
 void Engine::RenderDebug()
 {

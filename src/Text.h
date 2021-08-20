@@ -12,6 +12,13 @@ enum struct TextAlignment
 	Center
 };
 
+enum struct TextOrigin
+{
+	Top,
+	Mid,
+	Bottom
+};
+
 class Text
 {
 public:
@@ -19,7 +26,7 @@ public:
 	void SetPosition(Vector2f aPosition);
 	void SetText(const char* aText);
 	void SetColor(float aR, float aG, float aB);
-	void Render(bool aFast, TextAlignment aAlignment = TextAlignment::Left);
+	void Render(bool aFast, TextAlignment aAlignment = TextAlignment::Left, TextOrigin aOrigin = TextOrigin::Top);
 	void Destroy();
 private:
 	std::string myText = "";

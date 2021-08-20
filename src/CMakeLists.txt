@@ -30,6 +30,12 @@ target_sources(bammi
 		SpreadEffect.h
 		Random.cpp
 		Random.h
+		Button.cpp
+		Button.h
+		ButtonManager.cpp
+		ButtonManager.h
+		UIStateHandler.cpp
+		UIStateHandler.h
 )
 
 #add_library(Optick "")

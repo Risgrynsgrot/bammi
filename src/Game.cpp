@@ -2,6 +2,8 @@
 #include <assert.h>
 #include "WindowHandler.h"
 #include "InputHandler.h"
+#include "ButtonManager.h"
+#include "UIStateHandler.h"
 
 void Game::Init(SDL_Renderer* aRenderer)
 {
@@ -19,6 +21,8 @@ void Game::Start()
 	//myPlayerManager.AddPlayer({{0, 1, 0, 1}, "Alve"});
 	//myPlayerManager.AddPlayer({{1, 0, 0, 1}, "Kirsi"});
 	//myPlayerManager.AddPlayer({{0, 0, 0.3, 1}, "Rickard"});
+
+
 }
 
 void Game::Update(float aDeltaTime)
@@ -26,10 +30,12 @@ void Game::Update(float aDeltaTime)
 	myBoard.Update(aDeltaTime);
 	myPlayerManager.Update();
 	InputHandler& input = InputHandler::GetInstance();
+	auto mousePos = input.GetMousePosition();
+	Vector2f mousePosF = {(float)mousePos.x, (float)mousePos.y};
+
 	if(input.GetMouseKeyPressed(1) && myBoard.ReadyToPlay())
 	{
-		auto mousePos = input.GetMousePosition();
-		Bammi::Tile* tile = myBoard.GetTileAtPosition({(float)mousePos.x, (float)mousePos.y});
+		Bammi::Tile* tile = myBoard.GetTileAtPosition(mousePosF);
 		if(tile == nullptr)
 		{
 			return;
@@ -37,7 +43,7 @@ void Game::Update(float aDeltaTime)
 
 		Move move;
 		move.player = myPlayerManager.GetCurrentPlayerIndex();
-		int tileIndex = myBoard.GetTileIndexAtPosition({(float)mousePos.x, (float)mousePos.y});
+		int tileIndex = myBoard.GetTileIndexAtPosition(mousePosF);
 		move.tile = tileIndex;
 		if(tileIndex != -1 && !myPlayerManager.GameEnded())
 		{
