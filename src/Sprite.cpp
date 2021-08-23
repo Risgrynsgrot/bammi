@@ -10,7 +10,11 @@ void Sprite::Init(const char *aFilePath, SDL_Renderer* aRenderer)
 	assert(aRenderer != nullptr);
 	myRenderer = aRenderer;
 	SDL_Surface* surface = IMG_Load(aFilePath);
-	PrintLastSDLError();
+	if(!surface)
+	{
+		printf("Failed to load image in sprite: %s\n", aFilePath);
+		PrintLastSDLError();
+	}
 	myTexture = SDL_CreateTextureFromSurface(myRenderer, surface);
 	assert(myTexture != nullptr);
 	myDestRect.w = surface->w;

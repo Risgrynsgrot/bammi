@@ -18,8 +18,8 @@ bool Engine::Init()
 {
 	Random::GetInstance().Init();
 	InitRendering();
-	UIStateHandler::GetInstance().Init(myRenderer);
 	myGame.Init(myRenderer);
+	UIStateHandler::GetInstance().Init(myRenderer);
 
 	myMousePos.Init("assets/hack.ttf", 14, myRenderer);
 	myFramerate.Init("assets/hack.ttf", 14, myRenderer);

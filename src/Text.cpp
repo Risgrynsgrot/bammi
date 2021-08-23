@@ -1,5 +1,6 @@
 #include "Text.h"
 #include "Sprite.h"
+#include <assert.h>
 
 void Text::Init(const char* aFontPath, unsigned int aFontSize, SDL_Renderer* aRenderer)
 {
@@ -35,15 +36,19 @@ void Text::Render(bool aFast, TextAlignment aAlignment, TextOrigin aOrigin)
 		if(mySurface != nullptr)
 		{
 			SDL_DestroyTexture(myTexture);
+			myTexture = nullptr;
 			SDL_FreeSurface(mySurface);
+			mySurface = nullptr;
 		}
 		if(aFast)
 		{
 			mySurface = TTF_RenderText_Solid(myFont, myText.c_str(), myColor);
+			assert(mySurface != nullptr);
 		}
 		else
 		{
 			mySurface = TTF_RenderText_Blended(myFont, myText.c_str(), myColor);
+			assert(mySurface != nullptr);
 			//printf("dirty slow\n");
 		}
 		myTexture = SDL_CreateTextureFromSurface(myRenderer, mySurface);

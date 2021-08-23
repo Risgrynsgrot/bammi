@@ -73,7 +73,7 @@ void Game::Update(float aDeltaTime)
 
 void Game::Render()
 {
-	myBoard.Render();
+	//myBoard.Render();
 	myPlayerManager.Render();
 	//myBoard.RenderDebug();
 }

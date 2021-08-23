@@ -29,7 +29,7 @@ public:
 	void Render(bool aFast, TextAlignment aAlignment = TextAlignment::Left, TextOrigin aOrigin = TextOrigin::Top);
 	void Destroy();
 private:
-	std::string myText = "";
+	std::string myText = " ";
 	TTF_Font* myFont = nullptr;
 	SDL_Surface* mySurface = nullptr;
 	SDL_Texture* myTexture = nullptr;
