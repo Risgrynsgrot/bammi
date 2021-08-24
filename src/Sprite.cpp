@@ -17,6 +17,7 @@ void Sprite::Init(const char *aFilePath, SDL_Renderer* aRenderer)
 	}
 	myTexture = SDL_CreateTextureFromSurface(myRenderer, surface);
 	assert(myTexture != nullptr);
+	std::cout << "Texture pointer: "<< myTexture << std::endl;
 	myDestRect.w = surface->w;
 	myDestRect.h = surface->h;
 	SDL_FreeSurface(surface);

@@ -12,6 +12,7 @@ void Button::TryHover(Vector2f aMousePosition)
 	if (IsInside(aMousePosition))
 	{
 		mySprite.SetColorRGB(0.5, 0.5, 0.5);
+		myText.SetText("bruh");
 		return;
 	}
 	mySprite.SetColorRGB(1,1,1);
