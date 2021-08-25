@@ -1,6 +1,7 @@
 #include "UIStateHandler.h"
 #include "WindowHandler.h"
 #include <assert.h>
+#include <iostream>
 
 void UIStateHandler::Init(SDL_Renderer* aRenderer)
 {
@@ -10,7 +11,7 @@ void UIStateHandler::Init(SDL_Renderer* aRenderer)
     auto windowHandler = WindowHandler::GetInstance();
 
     const int spacing = 25;
-    const int buttonCount = 2;
+    const int buttonCount = 4;
 
     Vector2i position = windowHandler->GetWindowSize() / 2;
     const Vector2f size(300.f, 100.f);
@@ -20,11 +21,6 @@ void UIStateHandler::Init(SDL_Renderer* aRenderer)
     for (size_t i = 0; i < buttonCount; i++)
     {
         buttonIndex = mainMenu->CreateButton();
-        Button& button = mainMenu->GetButton(buttonIndex);
-
-        button.Init("assets/whitePixel.png", aRenderer);
-        button.SetPosition({position.x, position.y + i * (size.y + spacing)});
-        button.SetSize(size);
     }
     
     int buttonStartIndex = buttonIndex - (buttonCount - 1);
@@ -33,21 +29,29 @@ void UIStateHandler::Init(SDL_Renderer* aRenderer)
     auto& creditsButton = mainMenu->GetButton(buttonStartIndex + 2);
     auto& quitButton    = mainMenu->GetButton(buttonStartIndex + 3);
 
+    startButton.Init("assets/whitePixel.png", aRenderer);
 	startButton.SetText("Start");
-	startButton.SetOnClick([&]()
-    {
-        PopState();
-        PushState("game");
-    });
+	startButton.SetOnClick([&](){startButton.SetText("yuh");});
+    startButton.SetPosition({position.x, position.y + 0 * (size.y + spacing)});
+    startButton.SetSize(size);
 
+    optionsButton.Init("assets/whitePixel.png", aRenderer);
     optionsButton.SetText("Options");
 	optionsButton.SetOnClick([&](){PushState("Options");});
+    optionsButton.SetPosition({position.x, position.y + 1 * (size.y + spacing)});
+    optionsButton.SetSize(size);
 
+    creditsButton.Init("assets/whitePixel.png", aRenderer);
     creditsButton.SetText("Credits");
 	creditsButton.SetOnClick([&](){PushState("Credits");});
+    creditsButton.SetPosition({position.x, position.y + 2 * (size.y + spacing)});
+    creditsButton.SetSize(size);
 
+    quitButton.Init("assets/whitePixel.png", aRenderer);
 	quitButton.SetText("Quit");
-	quitButton.SetOnClick([&](){PopState();});
+	quitButton.SetOnClick([&](){quitButton.SetText("nah");});
+    quitButton.SetPosition({position.x, position.y + 3 * (size.y + spacing)});
+    quitButton.SetSize(size);
 
     myLoadedStates["mainmenu"] = mainMenu; //This should be in a file or something in the future, probably next project
     myLoadedStates["game"] = gameMenu;

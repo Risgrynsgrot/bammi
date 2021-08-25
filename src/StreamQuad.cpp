@@ -9,7 +9,10 @@ void StreamQuad::Init(SDL_Renderer* aRenderer, Vector2i aSize)
 	assert(aRenderer != nullptr);
 	myRenderer = aRenderer;
 	myTexture = SDL_CreateTexture(myRenderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, aSize.x, aSize.y); //Change this if we need transparency 
-	PrintLastSDLError();
+	if(!myTexture)
+	{
+		PrintLastSDLError();
+	}
 	assert(myTexture != nullptr);
 	myDestRect.w = aSize.x;
 	myDestRect.h = aSize.y;
