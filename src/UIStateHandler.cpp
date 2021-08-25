@@ -4,7 +4,8 @@
 
 void UIStateHandler::Init(SDL_Renderer* aRenderer)
 {
-	ButtonManager* buttonManager = new ButtonManager();
+	ButtonManager* mainMenu = new ButtonManager();
+	ButtonManager* gameMenu = new ButtonManager();
 
     auto windowHandler = WindowHandler::GetInstance();
 
@@ -18,8 +19,8 @@ void UIStateHandler::Init(SDL_Renderer* aRenderer)
     int buttonIndex = 0;
     for (size_t i = 0; i < buttonCount; i++)
     {
-        buttonIndex = buttonManager->CreateButton();
-        Button& button = buttonManager->GetButton(buttonIndex);
+        buttonIndex = mainMenu->CreateButton();
+        Button& button = mainMenu->GetButton(buttonIndex);
 
         button.Init("assets/whitePixel.png", aRenderer);
         button.SetPosition({position.x, position.y + i * (size.y + spacing)});
@@ -27,13 +28,17 @@ void UIStateHandler::Init(SDL_Renderer* aRenderer)
     }
     
     int buttonStartIndex = buttonIndex - (buttonCount - 1);
-    auto& startButton   = buttonManager->GetButton(buttonStartIndex);
-    auto& optionsButton = buttonManager->GetButton(buttonStartIndex + 1);
-    auto& creditsButton = buttonManager->GetButton(buttonStartIndex + 2);
-    auto& quitButton    = buttonManager->GetButton(buttonStartIndex + 3);
+    auto& startButton   = mainMenu->GetButton(buttonStartIndex);
+    auto& optionsButton = mainMenu->GetButton(buttonStartIndex + 1);
+    auto& creditsButton = mainMenu->GetButton(buttonStartIndex + 2);
+    auto& quitButton    = mainMenu->GetButton(buttonStartIndex + 3);
 
 	startButton.SetText("Start");
-	startButton.SetOnClick([&](){PopState();});
+	startButton.SetOnClick([&]()
+    {
+        PopState();
+        PushState("game");
+    });
 
     optionsButton.SetText("Options");
 	optionsButton.SetOnClick([&](){PushState("Options");});
@@ -44,9 +49,10 @@ void UIStateHandler::Init(SDL_Renderer* aRenderer)
 	quitButton.SetText("Quit");
 	quitButton.SetOnClick([&](){PopState();});
 
-    myLoadedStates["mainmenu"] = buttonManager; //This should be in a file or something in the future, probably next project
+    myLoadedStates["mainmenu"] = mainMenu; //This should be in a file or something in the future, probably next project
+    myLoadedStates["game"] = gameMenu;
 
-	UIStateHandler::GetInstance().PushState("mainmenu");
+	PushState("mainmenu");
 }
 void UIStateHandler::PushState(ButtonManager* aState)
 {
