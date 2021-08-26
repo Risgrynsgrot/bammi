@@ -23,6 +23,21 @@ void ButtonManager::Update(float aDeltaTime)
             myButtons[i].TryClick(mousePosF);
         }
     }
+
+    for (size_t i = 0; i < myTextBoxes.size(); i++)
+    {
+        myTextBoxes[i].Update(aDeltaTime);
+        if(!myTextBoxes[i].GetIsActive())
+        {
+            continue;
+        }
+        myTextBoxes[i].TryHover(mousePosF);
+        if(input.GetMouseKeyPressed(1))
+        {
+            myTextBoxes[i].TryClick(mousePosF);
+        }
+    }
+    
     
 }
 
@@ -36,6 +51,15 @@ void ButtonManager::Render()
         }
         myButtons[i].Render();
     }
+
+    for (size_t i = 0; i < myTextBoxes.size(); i++)
+    {
+        if(!myTextBoxes[i].GetIsActive())
+        {
+            continue;
+        }
+        myTextBoxes[i].Render();
+    }
 }
 
 int ButtonManager::CreateButton()
@@ -46,4 +70,26 @@ int ButtonManager::CreateButton()
 Button& ButtonManager::GetButton(int aIndex)
 {
     return myButtons[aIndex];
+}
+
+int ButtonManager::CreateTextBox()
+{
+    myTextBoxes.emplace_back();
+    return myTextBoxes.size() - 1;
+}
+TextBox& ButtonManager::GetTextBox(int aIndex)
+{
+    return myTextBoxes[aIndex];
+}
+
+bool ButtonManager::UpdateEvents(SDL_Event& aEvent)
+{
+    for(auto& textBox : myTextBoxes)
+    {
+        if(textBox.UpdateEvents(aEvent))
+        {
+            return true;
+        }
+    }
+    return false;
 }

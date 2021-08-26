@@ -9,17 +9,16 @@ void Button::Init(const char* aSpritePath, SDL_Renderer* aRenderer)
 
 void Button::TryHover(Vector2f aMousePosition)
 {
-	if (IsInside(aMousePosition))
+	if (myRect.IsInside(aMousePosition))
 	{
 		mySprite.SetColorRGB(0.5, 0.5, 0.5);
-		myText.SetText("bruh");
 		return;
 	}
 	mySprite.SetColorRGB(1,1,1);
 }
 void Button::TryClick(Vector2f aClickPosition)
 {
-	if (IsInside(aClickPosition))
+	if (myRect.IsInside(aClickPosition))
 	{
 		myOnClick();
 	}
@@ -30,24 +29,17 @@ void Button::SetOnClick(std::function<void()> aFunction)
 	myOnClick = aFunction;
 }
 
-bool Button::IsInside(Vector2f aClickPos)
-{
-	return myPosition.x < aClickPos.x &&
-		   myPosition.x + mySize.x > aClickPos.x &&
-		   myPosition.y < aClickPos.y &&
-		   myPosition.y + mySize.y > aClickPos.y;
-}
 
 void Button::SetSize(Vector2f aSize)
 {
-	mySize = aSize;
+	myRect.mySize = aSize;
 }
 
 void Button::Render()
 {
-	myText.SetPosition(myPosition + mySize / 2.f);
-	mySprite.SetSize(mySize);
-	mySprite.SetPosition(myPosition);
+	myText.SetPosition(myRect.myPosition + myRect.mySize / 2.f);
+	mySprite.SetSize(myRect.mySize);
+	mySprite.SetPosition(myRect.myPosition);
 
 	mySprite.Render();
 	myText.Render(false, TextAlignment::Center, TextOrigin::Mid);
@@ -55,7 +47,7 @@ void Button::Render()
 
 void Button::SetPosition(Vector2f aPosition)
 {
-	myPosition = aPosition;
+	myRect.myPosition = aPosition;
 }
 void Button::SetText(const char* aText)
 {

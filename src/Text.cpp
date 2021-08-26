@@ -19,9 +19,13 @@ void Text::SetText(const char* aText)
 	{
 		return;
 	}
-
 	myText = aText;
 	myDirty = true;
+	if(myText.empty())
+	{
+		myDestRect.w = 0;
+		myDirty = false;
+	}
 }
 void Text::Destroy()
 {
@@ -31,6 +35,10 @@ void Text::Destroy()
 }
 void Text::Render(bool aFast, TextAlignment aAlignment, TextOrigin aOrigin)
 {
+	if(myText.empty())
+	{
+		return;
+	}
 	if(myDirty)
 	{
 		if(mySurface != nullptr)

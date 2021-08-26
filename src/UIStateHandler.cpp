@@ -2,8 +2,9 @@
 #include "WindowHandler.h"
 #include <assert.h>
 #include <iostream>
+#include "Game.h"
 
-void UIStateHandler::Init(SDL_Renderer* aRenderer)
+void UIStateHandler::Init(SDL_Renderer* aRenderer, Game& aGame)
 {
 	ButtonManager* mainMenu = new ButtonManager();
 	ButtonManager* gameMenu = new ButtonManager();
@@ -22,6 +23,13 @@ void UIStateHandler::Init(SDL_Renderer* aRenderer)
     {
         buttonIndex = mainMenu->CreateButton();
     }
+
+    int textBoxIndex = mainMenu->CreateTextBox();
+
+    auto& textBox = mainMenu->GetTextBox(textBoxIndex);
+    textBox.Init(aRenderer);
+    textBox.SetTooltipText("IP address...");
+    textBox.SetPosition({128, 128});
     
     int buttonStartIndex = buttonIndex - (buttonCount - 1);
     auto& startButton   = mainMenu->GetButton(buttonStartIndex);
@@ -31,7 +39,12 @@ void UIStateHandler::Init(SDL_Renderer* aRenderer)
 
     startButton.Init("assets/whitePixel.png", aRenderer);
 	startButton.SetText("Start");
-	startButton.SetOnClick([&](){startButton.SetText("yuh");});
+	startButton.SetOnClick([&]()
+    {
+        PopState();
+        PushState("game");
+        aGame.Start();
+    });
     startButton.SetPosition({position.x, position.y + 0 * (size.y + spacing)});
     startButton.SetSize(size);
 
@@ -90,4 +103,12 @@ void UIStateHandler::Render()
         return;
 
     myStates.top()->Render();
+}
+
+bool UIStateHandler::UpdateEvents(SDL_Event& aEvent)
+{
+    if(myStates.empty())
+        return false;
+
+    return myStates.top()->UpdateEvents(aEvent);
 }

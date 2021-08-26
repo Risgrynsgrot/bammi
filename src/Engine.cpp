@@ -19,7 +19,7 @@ bool Engine::Init()
 	Random::GetInstance().Init();
 	InitRendering();
 	myGame.Init(myRenderer);
-	UIStateHandler::GetInstance().Init(myRenderer);
+	UIStateHandler::GetInstance().Init(myRenderer, myGame);
 
 	myMousePos.Init("assets/hack.ttf", 14, myRenderer);
 	myFramerate.Init("assets/hack.ttf", 14, myRenderer);
@@ -37,7 +37,7 @@ void Engine::InitMainLoop()
 #ifdef __EMSCRIPTEN__
 	emscripten_set_main_loop(Update, 0, 1);
 #else
-	myGame.Start();
+	//myGame.Start();
 	while (myRunning)
 	{
 		Update();
@@ -165,6 +165,10 @@ void Engine::HandleEvents()
 {
 	while (SDL_PollEvent(&myEvent))
 	{
+		if(UIStateHandler::GetInstance().UpdateEvents(myEvent))
+		{
+			continue;
+		}
 		if (InputHandler::GetInstance().UpdateEvents(myEvent))
 		{
 			continue;
@@ -174,6 +178,6 @@ void Engine::HandleEvents()
 		case SDL_QUIT:
 			myRunning = false;
 			break;
-		}
+		};
 	}
 }

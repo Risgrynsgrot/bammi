@@ -21,4 +21,5 @@ private:
 	PlayerManager myPlayerManager;
 	SDL_Renderer* myRenderer;
 	Bammi::Board myBoard;
+	bool myStarted = false;
 };

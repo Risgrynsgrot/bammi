@@ -4,6 +4,7 @@
 #endif
 #include "Engine.h"
 #include <time.h>
+#include <steam/steamnetworkingsockets.h>
 
 Engine engine;
 
@@ -34,6 +35,9 @@ Engine engine;
 
 int main(int argc, char *argv[])
 {
+
+    SteamNetworkingIPAddr addr;
+    addr.Clear();
     //bool done = false;
     //std::string input;
 

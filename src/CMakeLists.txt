@@ -36,6 +36,10 @@ target_sources(bammi
 		ButtonManager.h
 		UIStateHandler.cpp
 		UIStateHandler.h
+		CollisionRect.cpp
+		CollisionRect.h
+		TextBox.cpp
+		TextBox.h
 )
 
 #add_library(Optick "")

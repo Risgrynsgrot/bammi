@@ -22,11 +22,16 @@ void Game::Start()
 	//myPlayerManager.AddPlayer({{1, 0, 0, 1}, "Kirsi"});
 	//myPlayerManager.AddPlayer({{0, 0, 0.3, 1}, "Rickard"});
 
-
+	myStarted = true;
 }
 
 void Game::Update(float aDeltaTime)
 {
+	if(!myStarted)
+	{
+		return;
+	}
+
 	myBoard.Update(aDeltaTime);
 	myPlayerManager.Update();
 	InputHandler& input = InputHandler::GetInstance();
@@ -73,7 +78,7 @@ void Game::Update(float aDeltaTime)
 
 void Game::Render()
 {
-	//myBoard.Render();
+	myBoard.Render();
 	myPlayerManager.Render();
 	//myBoard.RenderDebug();
 }

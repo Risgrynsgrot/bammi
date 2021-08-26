@@ -3,6 +3,7 @@
 #include "Vector2.h"
 #include "Text.h"
 #include "Sprite.h"
+#include "CollisionRect.h"
 
 class Button
 {
@@ -18,9 +19,7 @@ public:
 	void SetActive(bool aActive);
 	inline bool GetIsActive(){return myIsActive;};
 private:
-	bool IsInside(Vector2f aClickPosition);
-	Vector2f myPosition;
-	Vector2f mySize;
+	CollisionRect myRect;
 	std::function<void()> myOnClick;
 	Text myText;
 	Sprite mySprite;

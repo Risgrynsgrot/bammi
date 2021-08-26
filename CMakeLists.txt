@@ -50,3 +50,6 @@ target_link_libraries(bammi PUBLIC SDL2main)
 target_link_libraries(bammi PUBLIC SDL2_image)
 target_link_libraries(bammi PUBLIC SDL2_ttf)
 #target_link_libraries(bammi PUBLIC Optick)
+
+find_package(GameNetworkingSockets CONFIG REQUIRED)
+target_link_libraries(bammi PRIVATE GameNetworkingSockets::GameNetworkingSockets)

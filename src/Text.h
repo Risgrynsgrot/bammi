@@ -28,6 +28,8 @@ public:
 	void SetColor(float aR, float aG, float aB);
 	void Render(bool aFast, TextAlignment aAlignment = TextAlignment::Left, TextOrigin aOrigin = TextOrigin::Top);
 	void Destroy();
+	Vector2f GetSize() {return Vector2f(myDestRect.w, myDestRect.h);};
+	Vector2f GetPosition() {return Vector2f(myDestRect.x, myDestRect.y);};
 private:
 	std::string myText = " ";
 	TTF_Font* myFont = nullptr;
